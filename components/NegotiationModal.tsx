@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Talent, GameState } from '../types';
 import { getNegotiationResponse } from '../services/geminiService';
-import { X, Send, DollarSign, Percent, CheckCircle, AlertCircle, Target } from 'lucide-react';
+import { X, Send, DollarSign, Percent, CheckCircle, AlertCircle } from 'lucide-react';
 
 interface NegotiationModalProps {
   talent: Talent;
@@ -23,36 +23,6 @@ const NegotiationModal: React.FC<NegotiationModalProps> = ({ talent, gameState, 
   
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  // Réglages prédéfinis par pays basés sur les listes d'artistes
-  const getPresetOffer = (country: string) => {
-    const presets: Record<string, { advance: number, royalty: number }> = {
-      'France': { advance: 150000, royalty: 18 },
-      'United States': { advance: 200000, royalty: 20 },
-      'Japan': { advance: 180000, royalty: 19 },
-      'Brazil': { advance: 120000, royalty: 16 },
-      'Nigeria': { advance: 100000, royalty: 15 },
-      'South Korea': { advance: 170000, royalty: 18 },
-      'United Kingdom': { advance: 190000, royalty: 19 },
-      'Colombia': { advance: 110000, royalty: 15 },
-      'Germany': { advance: 160000, royalty: 17 },
-      'South Africa': { advance: 95000, royalty: 14 },
-      'Canada': { advance: 140000, royalty: 16 },
-      'Australia': { advance: 130000, royalty: 16 },
-      'India': { advance: 90000, royalty: 13 },
-      'Mexico': { advance: 105000, royalty: 14 },
-      'Italy': { advance: 125000, royalty: 15 },
-      'Spain': { advance: 115000, royalty: 15 }
-    };
-    
-    return presets[country] || { advance: 100000, royalty: 15 };
-  };
-
-  const applyPresetOffer = () => {
-    const preset = getPresetOffer(talent.country);
-    setOfferAdvance(Math.min(preset.advance, gameState.budget));
-    setOfferRoyalty(preset.royalty);
-  };
-
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
@@ -65,6 +35,30 @@ const NegotiationModal: React.FC<NegotiationModalProps> = ({ talent, gameState, 
     const newMessages = [...messages, { role: 'user' as const, text: userInput }];
     setMessages(newMessages);
     setUserInput("");
+    setIsTyping(true);
+
+    try {
+      const response = await getNegotiationResponse(talent, offerAdvance, offerRoyalty, newMessages);
+      
+      setMessages(prev => [...prev, { role: 'model' as const, text: response.reply }]);
+      
+      if (response.accepted) {
+        setDealStatus('accepted');
+      }
+    } catch (error) {
+      console.error(error);
+      setMessages(prev => [...prev, { role: 'model' as const, text: "Désolé, j'ai besoin d'un moment pour réfléchir. Reparlons plus tard." }]);
+    } finally {
+      setIsTyping(false);
+    }
+  };
+
+  const handleSendCurrentOffer = async () => {
+    if (isTyping || dealStatus !== 'negotiating') return;
+
+    const offerMessage = `Je te propose une avance de ${offerAdvance.toLocaleString()}€ et ${offerRoyalty}% de royalties. Qu'est-ce que tu en dis ?`;
+    const newMessages = [...messages, { role: 'user' as const, text: offerMessage }];
+    setMessages(newMessages);
     setIsTyping(true);
 
     try {
@@ -170,15 +164,6 @@ const NegotiationModal: React.FC<NegotiationModalProps> = ({ talent, gameState, 
           <h2 className="text-xl font-bold text-white tracking-tight uppercase">Termes du Contrat</h2>
           
           <div className="space-y-6">
-            <button
-              onClick={applyPresetOffer}
-              disabled={dealStatus !== 'negotiating'}
-              className="w-full py-3 bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 disabled:from-slate-700 disabled:to-slate-700 text-white rounded-xl font-bold shadow-lg shadow-violet-500/20 transition-all transform active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-            >
-              <Target className="w-4 h-4" />
-              APPLIQUER RÉGLAGES PRÉDÉFINIS ({talent.country})
-            </button>
-            
             <div className="space-y-3">
               <div className="flex justify-between items-center">
                 <span className="text-[10px] uppercase font-bold text-slate-500 flex items-center gap-1">
@@ -216,6 +201,14 @@ const NegotiationModal: React.FC<NegotiationModalProps> = ({ talent, gameState, 
                 className="w-full accent-violet-600 h-1.5 bg-white/10 rounded-lg appearance-none cursor-pointer"
               />
             </div>
+
+            <button
+              onClick={handleSendCurrentOffer}
+              disabled={dealStatus !== 'negotiating' || isTyping}
+              className="w-full py-3 bg-violet-600 hover:bg-violet-500 disabled:bg-slate-800 text-white rounded-xl font-bold transition-all transform active:scale-95 shadow-lg shadow-violet-500/20 disabled:opacity-50"
+            >
+              📤 ENVOYER L'OFFRE ACTUELLE
+            </button>
           </div>
 
           <div className="mt-auto p-4 rounded-2xl bg-white/5 border border-white/5 space-y-4">
