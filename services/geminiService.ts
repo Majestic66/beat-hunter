@@ -159,7 +159,7 @@ export async function generateTalentsForCountry(countryName: string): Promise<Pa
   await new Promise(resolve => setTimeout(resolve, 800 + Math.random() * 400));
 
   const cacheKey = `${countryName}-${Date.now()}`;
-  const numArtists = 5 + Math.floor(Math.random() * 3); // 5-7 artistes
+  const numArtists = 3; // 3 artistes aléatoires
 
   // Génère des artistes frais à chaque visite (inspiré par la créativité de Grok)
   const artists: Partial<Talent>[] = [];
