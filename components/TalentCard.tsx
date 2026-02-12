@@ -19,8 +19,9 @@ const TalentCard: React.FC<TalentCardProps> = ({ talent, onNegotiate }) => {
               <div className="absolute inset-0 flex items-center justify-center">
                 <img src={talent.avatar} alt={talent.name} className="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-700" />
               </div>
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 to-transparent"></div>
-        <div className="absolute bottom-4 left-4">
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 to-transparent"></div>
+              </div>
+              <div className="absolute bottom-4 left-4">
           <h3 className="text-xl font-bold text-white">{talent.name}</h3>
           <p className="text-xs text-violet-300 font-semibold uppercase tracking-wider">{talent.genre} • {talent.age} ANS</p>
         </div>
