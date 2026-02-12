@@ -160,7 +160,7 @@ const NegotiationModal: React.FC<NegotiationModalProps> = ({ talent, gameState, 
           </div>
         </div>
 
-        <div className="w-80 bg-slate-900 border-l border-white/10 p-8 flex flex-col gap-6">
+        <div className="w-80 bg-slate-900 border-l border-white/10 p-8 flex flex-col gap-6 overflow-y-auto max-h-full">
           <h2 className="text-xl font-bold text-white tracking-tight uppercase">Termes du Contrat</h2>
           
           <div className="space-y-6">
