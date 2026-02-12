@@ -2,9 +2,16 @@
 // Génère des rookies fictifs avec des noms originaux et des personnalités variées
 
 import { Talent, Genre, Personality, Release } from "../types";
+import { frenchArtists } from "../utils/randomArtistSelector";
 
 // Générateur de noms fictifs inspiré par Grok (logique créative et variée)
 function generateArtistName(countryName: string, seed: number): string {
+  if (countryName === 'France') {
+    // Utiliser la liste des artistes français fournie
+    const index = seed % frenchArtists.length;
+    return frenchArtists[index].split(' – ')[0]; // Prendre seulement le nom, pas le style
+  }
+
   const prefixes = {
     'France': ['Étoile', 'Lune', 'Soleil', 'Vent', 'Mer', 'Montagne', 'Rivière', 'Forêt', 'Ville', 'Art'],
     'United States': ['Star', 'Dream', 'Soul', 'Heart', 'Fire', 'Wind', 'Ocean', 'Mountain', 'City', 'Light'],
