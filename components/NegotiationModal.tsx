@@ -16,11 +16,7 @@ const NegotiationModal: React.FC<NegotiationModalProps> = ({ talent, gameState, 
     { role: 'model', text: `Salut, je suis ${talent.name}. Mon manager m'a dit que tu cherchais du sang neuf. C'est quoi ta proposition ?` }
   ]);
   const [userInput, setUserInput] = useState("");
-  const [offerAdvance, setOfferAdvance] = useState(() => {
-    const initial = talent.requestedAdvance;
-    const rounded = Math.round(initial / 5000) * 5000;
-    return Math.min(rounded, gameState.budget);
-  });
+  const [offerAdvance, setOfferAdvance] = useState(talent.requestedAdvance);
   const [offerRoyalty, setOfferRoyalty] = useState(talent.requestedRoyalty);
   const [isTyping, setIsTyping] = useState(false);
   const [dealStatus, setDealStatus] = useState<'negotiating' | 'accepted' | 'rejected'>('negotiating');
@@ -164,40 +160,41 @@ const NegotiationModal: React.FC<NegotiationModalProps> = ({ talent, gameState, 
           </div>
         </div>
 
-        <div className="w-80 bg-slate-900 border-l border-white/10 p-8 flex flex-col gap-8">
+        <div className="w-80 bg-slate-900 border-l border-white/10 p-8 flex flex-col gap-6">
           <h2 className="text-xl font-bold text-white tracking-tight uppercase">Termes du Contrat</h2>
           
           <div className="space-y-6">
-            <div className="space-y-3">
+            {/* Avance */}
+            <div className="space-y-3 p-4 bg-white/5 rounded-xl border border-white/10">
               <div className="flex justify-between items-center">
-                <span className="text-[10px] uppercase font-bold text-slate-500 flex items-center gap-1">
+                <label className="text-[10px] uppercase font-bold text-slate-400 flex items-center gap-1">
                   <DollarSign className="w-3 h-3" /> Avance (€)
-                </span>
-                <span className="text-sm font-bold text-violet-400">{offerAdvance.toLocaleString()}€</span>
+                </label>
+                <span className="text-lg font-bold text-emerald-400 font-mono">{offerAdvance.toLocaleString()}€</span>
               </div>
               <input 
                 type="range"
                 min="0"
                 max={gameState.budget}
-                step="5000"
+                step="1000"
                 value={offerAdvance}
-                onChange={(e) => {
-                  const newValue = Number(e.target.value);
-                  const roundedValue = Math.round(newValue / 5000) * 5000;
-                  const clampedValue = Math.min(roundedValue, gameState.budget);
-                  setOfferAdvance(clampedValue);
-                }}
+                onChange={(e) => setOfferAdvance(Number(e.target.value))}
                 disabled={dealStatus !== 'negotiating'}
-                className="w-full accent-violet-600 h-1.5 bg-white/10 rounded-lg appearance-none cursor-pointer"
+                className="w-full accent-emerald-500 h-2.5 bg-white/20 rounded-lg appearance-none cursor-pointer hover:bg-white/30 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               />
+              <div className="flex justify-between text-[9px] text-slate-500 font-bold">
+                <span>0€</span>
+                <span>{gameState.budget.toLocaleString()}€</span>
+              </div>
             </div>
 
-            <div className="space-y-3">
+            {/* Royalties */}
+            <div className="space-y-3 p-4 bg-white/5 rounded-xl border border-white/10">
               <div className="flex justify-between items-center">
-                <span className="text-[10px] uppercase font-bold text-slate-500 flex items-center gap-1">
+                <label className="text-[10px] uppercase font-bold text-slate-400 flex items-center gap-1">
                   <Percent className="w-3 h-3" /> Royalties (%)
-                </span>
-                <span className="text-sm font-bold text-violet-400">{offerRoyalty}%</span>
+                </label>
+                <span className="text-lg font-bold text-cyan-400 font-mono">{offerRoyalty}%</span>
               </div>
               <input 
                 type="range"
@@ -205,19 +202,42 @@ const NegotiationModal: React.FC<NegotiationModalProps> = ({ talent, gameState, 
                 max="50"
                 step="1"
                 value={offerRoyalty}
-                onChange={(e) => {
-                  const newValue = Number(e.target.value);
-                  setOfferRoyalty(newValue);
-                }}
+                onChange={(e) => setOfferRoyalty(Number(e.target.value))}
                 disabled={dealStatus !== 'negotiating'}
-                className="w-full accent-violet-600 h-1.5 bg-white/10 rounded-lg appearance-none cursor-pointer"
+                className="w-full accent-cyan-500 h-2.5 bg-white/20 rounded-lg appearance-none cursor-pointer hover:bg-white/30 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               />
+              <div className="flex justify-between text-[9px] text-slate-500 font-bold">
+                <span>0%</span>
+                <span>50%</span>
+              </div>
+            </div>
+
+            {/* Résumé financier */}
+            <div className="p-4 bg-violet-600/20 rounded-xl border border-violet-500/30 space-y-3">
+              <h4 className="text-xs font-bold text-violet-300 uppercase tracking-wider">💰 Résumé Financier</h4>
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-slate-400">Avance à payer :</span>
+                  <span className="text-emerald-400 font-bold">{offerAdvance.toLocaleString()}€</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-slate-400">Budget restant :</span>
+                  <span className={`font-bold ${gameState.budget - offerAdvance < 0 ? 'text-red-400' : 'text-slate-300'}`}>
+                    {(gameState.budget - offerAdvance).toLocaleString()}€
+                  </span>
+                </div>
+              </div>
+              {offerAdvance > gameState.budget && (
+                <div className="text-red-400 text-xs font-bold flex items-start gap-2">
+                  ⚠️ Budget insuffisant!
+                </div>
+              )}
             </div>
 
             <button
               onClick={handleSendCurrentOffer}
-              disabled={dealStatus !== 'negotiating' || isTyping}
-              className="w-full py-3 bg-violet-600 hover:bg-violet-500 disabled:bg-slate-800 text-white rounded-xl font-bold transition-all transform active:scale-95 shadow-lg shadow-violet-500/20 disabled:opacity-50"
+              disabled={dealStatus !== 'negotiating' || isTyping || offerAdvance > gameState.budget}
+              className="w-full py-3 bg-violet-600 hover:bg-violet-500 disabled:bg-slate-800 text-white rounded-xl font-bold transition-all transform active:scale-95 shadow-lg shadow-violet-500/20 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
             >
               📤 ENVOYER L'OFFRE ACTUELLE
             </button>
