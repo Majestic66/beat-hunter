@@ -21,6 +21,9 @@ const ArtistManager: React.FC<ArtistManagerProps> = ({ artist, gameState, onBack
   const [isReleasing, setIsReleasing] = useState(false);
   const [strategy, setStrategy] = useState("Virale (TikTok/Reels)");
   const [lastRelease, setLastRelease] = useState<Release | null>(null);
+  const [releaseType, setReleaseType] = useState<'single' | 'album'>('single');
+  const [albumTitle, setAlbumTitle] = useState('');
+  const [trackCount, setTrackCount] = useState(8);
   
   // Chat state
   const [chatMessages, setChatMessages] = useState<{ role: 'user' | 'model', text: string }[]>([
@@ -70,12 +73,36 @@ const ArtistManager: React.FC<ArtistManagerProps> = ({ artist, gameState, onBack
     try {
       const collaborators = selectedCollab ? [selectedCollab] : [];
       const release = await generateReleaseResult(artist, strategy, collaborators);
-      const cover = await generateCoverArt(release.songTitle, artist.genre);
-      const finalRelease = { ...release, cover };
-      
-      setLastRelease(finalRelease);
-      onUpdateState({ type: 'NEW_RELEASE', artistId: artist.id, release: finalRelease });
-      setSelectedCollab(null);
+
+      // If creating an album, adapt the release object accordingly
+      if (releaseType === 'album') {
+        const title = albumTitle.trim() || `${artist.name} - Album ${new Date().getFullYear()}`;
+        const cover = await generateCoverArt(title, artist.genre);
+
+        const albumRelease: Release = {
+          ...release,
+          songTitle: title,
+          type: 'album',
+          trackCount,
+          cover,
+          streams: 0,
+          monthlyStreams: Math.floor(Math.random() * 1000000) + 100000,
+          releaseDate: new Date().toISOString(),
+          // initial revenue scaled for albums
+          revenue: Math.round((release.revenue || 0) * trackCount * 0.8)
+        };
+
+        setLastRelease(albumRelease);
+        onUpdateState({ type: 'NEW_RELEASE', artistId: artist.id, release: albumRelease });
+        setSelectedCollab(null);
+      } else {
+        const cover = await generateCoverArt(release.songTitle, artist.genre);
+        const finalRelease = { ...release, cover };
+
+        setLastRelease(finalRelease);
+        onUpdateState({ type: 'NEW_RELEASE', artistId: artist.id, release: finalRelease });
+        setSelectedCollab(null);
+      }
     } catch (e) {
       console.error(e);
     } finally {
@@ -98,7 +125,7 @@ const ArtistManager: React.FC<ArtistManagerProps> = ({ artist, gameState, onBack
           <button onClick={onBack} className="p-3 bg-white/5 rounded-full hover:bg-white/10 transition-colors">
             <ArrowLeft className="w-5 h-5" />
           </button>
-          <img src={artist.avatar} className="w-16 h-16 rounded-2xl object-cover border-2 border-violet-500 shadow-lg" />
+          <img src={artist.avatar} className="w-20 h-20 aspect-square rounded-md object-contain border-2 border-violet-500 shadow-lg bg-slate-800" />
           <div>
             <h1 className="text-3xl font-black italic tracking-tighter text-white">{artist.name}</h1>
             <div className="flex gap-2 items-center">
@@ -146,6 +173,28 @@ const ArtistManager: React.FC<ArtistManagerProps> = ({ artist, gameState, onBack
                   </h3>
                   
                   <div className="space-y-4">
+                    <div className="flex items-center gap-3">
+                      <label className={`px-3 py-2 rounded-2xl cursor-pointer ${releaseType === 'single' ? 'bg-violet-600/20 border-violet-500 text-white' : 'bg-white/5 border-white/5 text-slate-400'}`}>
+                        <input type="radio" name="releaseType" className="hidden" value="single" checked={releaseType === 'single'} onChange={() => setReleaseType('single')} />
+                        Single
+                      </label>
+                      <label className={`px-3 py-2 rounded-2xl cursor-pointer ${releaseType === 'album' ? 'bg-violet-600/20 border-violet-500 text-white' : 'bg-white/5 border-white/5 text-slate-400'}`}>
+                        <input type="radio" name="releaseType" className="hidden" value="album" checked={releaseType === 'album'} onChange={() => setReleaseType('album')} />
+                        Album
+                      </label>
+                    </div>
+
+                    {releaseType === 'album' && (
+                      <div className="space-y-3">
+                        <label className="text-xs font-bold text-slate-500 uppercase">Titre de l'album</label>
+                        <input value={albumTitle} onChange={(e) => setAlbumTitle(e.target.value)} placeholder="Titre de l'album" className="w-full px-4 py-3 rounded-2xl bg-white/5 border border-white/5 text-white" />
+
+                        <div className="flex items-center gap-3">
+                          <label className="text-xs font-bold text-slate-500 uppercase">Nombre de titres</label>
+                          <input type="number" min={4} max={30} value={trackCount} onChange={(e) => setTrackCount(Number(e.target.value))} className="w-20 px-3 py-2 rounded-2xl bg-white/5 border border-white/5 text-white" />
+                        </div>
+                      </div>
+                    )}
                     <p className="text-xs font-bold text-slate-500 uppercase">Stratégie</p>
                     <div className="grid grid-cols-2 gap-3">
                       {["Virale (TikTok)", "Studio (Hi-Fi)", "Buzz de Rue", "Niche Artistique"].map(s => (
@@ -167,7 +216,7 @@ const ArtistManager: React.FC<ArtistManagerProps> = ({ artist, gameState, onBack
                     {selectedCollab ? (
                       <div className="flex items-center justify-between bg-violet-600/20 border border-violet-500/30 p-4 rounded-2xl">
                         <div className="flex items-center gap-3">
-                          <img src={selectedCollab.avatar} className="w-8 h-8 rounded-full" />
+                          <img src={selectedCollab.avatar} className="w-8 h-8 aspect-square rounded-md object-contain bg-slate-800" />
                           <span className="font-bold text-white">{selectedCollab.name}</span>
                         </div>
                         <button onClick={() => setSelectedCollab(null)} className="p-1 hover:bg-white/10 rounded-full">

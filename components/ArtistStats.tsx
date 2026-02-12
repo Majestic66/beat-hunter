@@ -4,7 +4,7 @@ import { generateReleaseResult, generateCoverArt } from '../services/geminiServi
 import {
   Music, TrendingUp, DollarSign, Award, Users, Heart, Calendar,
   Star, Target, Zap, Disc, Play, BarChart3, Clock, Crown,
-  Loader2, Sparkles, Plus, Minus, ChevronUp, ChevronDown
+  Loader2, Sparkles, Minus, ChevronUp, ChevronDown
 } from 'lucide-react';
 
 interface ArtistStatsProps {
@@ -14,7 +14,7 @@ interface ArtistStatsProps {
 }
 
 const ArtistStats: React.FC<ArtistStatsProps> = ({ artist, gameState, onUpdateState }) => {
-  const [activeTab, setActiveTab] = useState<'stats' | 'releases' | 'create'>('stats');
+  const [activeTab, setActiveTab] = useState<'stats' | 'releases'>('stats');
   const [isCreating, setIsCreating] = useState(false);
   const [releaseType, setReleaseType] = useState<'single' | 'album'>('single');
   const [releaseTitle, setReleaseTitle] = useState('');
@@ -128,8 +128,7 @@ const ArtistStats: React.FC<ArtistStatsProps> = ({ artist, gameState, onUpdateSt
       <div className="flex gap-2 mb-6">
         {[
           { id: 'stats', label: 'Statistiques', icon: BarChart3 },
-          { id: 'releases', label: 'Releases', icon: Disc },
-          { id: 'create', label: 'Créer', icon: Plus }
+          { id: 'releases', label: 'Releases', icon: Disc }
         ].map((tab) => (
           <button
             key={tab.id}
@@ -345,118 +344,7 @@ const ArtistStats: React.FC<ArtistStatsProps> = ({ artist, gameState, onUpdateSt
         </div>
       )}
 
-      {activeTab === 'create' && (
-        <div className="space-y-6">
-          <h3 className="font-bold text-white mb-4">Créer une Nouvelle Release</h3>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-4">
-              <div>
-                <label className="block text-white/80 mb-2">Type de Release</label>
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => setReleaseType('single')}
-                    className={`flex-1 p-3 rounded-lg border transition-colors ${
-                      releaseType === 'single'
-                        ? 'bg-violet-600 border-violet-500 text-white'
-                        : 'bg-white/10 border-white/20 text-white/60 hover:bg-white/20'
-                    }`}
-                  >
-                    <Play className="w-4 h-4 inline mr-2" />
-                    Single
-                  </button>
-                  <button
-                    onClick={() => setReleaseType('album')}
-                    className={`flex-1 p-3 rounded-lg border transition-colors ${
-                      releaseType === 'album'
-                        ? 'bg-violet-600 border-violet-500 text-white'
-                        : 'bg-white/10 border-white/20 text-white/60 hover:bg-white/20'
-                    }`}
-                  >
-                    <Disc className="w-4 h-4 inline mr-2" />
-                    Album
-                  </button>
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-white/80 mb-2">Titre</label>
-                <input
-                  type="text"
-                  value={releaseTitle}
-                  onChange={(e) => setReleaseTitle(e.target.value)}
-                  placeholder={releaseType === 'album' ? "Titre de l'album" : "Titre du single"}
-                  className="w-full bg-white/10 border border-white/20 rounded-lg p-3 text-white placeholder-white/50"
-                />
-              </div>
-
-              {releaseType === 'album' && (
-                <div>
-                  <label className="block text-white/80 mb-2">Nombre de pistes</label>
-                  <input
-                    type="number"
-                    min="1"
-                    max="20"
-                    value={trackCount}
-                    onChange={(e) => setTrackCount(parseInt(e.target.value))}
-                    className="w-full bg-white/10 border border-white/20 rounded-lg p-3 text-white"
-                  />
-                </div>
-              )}
-            </div>
-
-            <div className="space-y-4">
-              <div>
-                <label className="block text-white/80 mb-2">Stratégie de Promotion</label>
-                <div className="space-y-2">
-                  {strategies.map((strat) => (
-                    <button
-                      key={strat.id}
-                      onClick={() => setStrategy(strat.name)}
-                      className={`w-full p-3 rounded-lg border text-left transition-colors ${
-                        strategy === strat.name
-                          ? 'bg-violet-600 border-violet-500 text-white'
-                          : 'bg-white/10 border-white/20 text-white/60 hover:bg-white/20'
-                      }`}
-                    >
-                      <div className="flex justify-between items-center">
-                        <span className="font-bold">{strat.name}</span>
-                        <span className="text-sm">{strat.cost}€</span>
-                      </div>
-                      <div className="text-xs mt-1">
-                        Efficacité: {(strat.effectiveness * 100).toFixed(0)}%
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="flex justify-between items-center pt-4 border-t border-white/10">
-            <div className="text-white/60">
-              Coût estimé: {strategies.find(s => s.name === strategy)?.cost}€
-            </div>
-            <button
-              onClick={handleCreateRelease}
-              disabled={!releaseTitle.trim() || isCreating}
-              className="px-6 py-3 bg-violet-600 hover:bg-violet-700 disabled:bg-gray-600 text-white rounded-lg transition-colors flex items-center gap-2"
-            >
-              {isCreating ? (
-                <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  Création...
-                </>
-              ) : (
-                <>
-                  <Sparkles className="w-4 h-4" />
-                  Créer la Release
-                </>
-              )}
-            </button>
-          </div>
-        </div>
-      )}
+      
     </div>
   );
 };
