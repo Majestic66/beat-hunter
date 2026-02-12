@@ -6,6 +6,7 @@ import { frenchArtists } from "../utils/randomArtistSelector";
 import { usArtists } from "../utils/randomArtistSelectorUS";
 import { japanArtists } from "../utils/randomArtistSelectorJapan";
 import { brazilArtists } from "../utils/randomArtistSelectorBrazil";
+import { nigeriaArtists } from "../utils/randomArtistSelectorNigeria";
 
 // Générateur de noms fictifs inspiré par Grok (logique créative et variée)
 function generateArtistName(countryName: string, seed: number): string {
@@ -28,6 +29,11 @@ function generateArtistName(countryName: string, seed: number): string {
     // Utiliser la liste des artistes brésiliens fournie
     const index = seed % brazilArtists.length;
     return brazilArtists[index].split(' – ')[0]; // Prendre seulement le nom, pas le style
+  }
+  if (countryName === 'Nigeria') {
+    // Utiliser la liste des artistes nigérians fournie
+    const index = seed % nigeriaArtists.length;
+    return nigeriaArtists[index].split(' – ')[0]; // Prendre seulement le nom, pas le style
   }
 
   const prefixes = {
