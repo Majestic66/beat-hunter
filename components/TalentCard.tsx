@@ -10,20 +10,22 @@ interface TalentCardProps {
 
 const TalentCard: React.FC<TalentCardProps> = ({ talent, onNegotiate }) => {
   return (
-    <div className="glass rounded-2xl overflow-hidden border border-white/10 group hover:border-violet-500/50 transition-all duration-300 flex flex-col">
-      <div className="relative h-48 overflow-hidden">
-            <div className="relative h-48 overflow-hidden rounded-2xl">
-              {/* Blurred background to fill the card while keeping the main image fully visible */}
-              <img src={talent.avatar} alt={`bg-${talent.name}`} className="absolute inset-0 w-full h-full object-cover filter blur-lg scale-105" />
-              {/* Foreground image shown fully centered without cropping */}
-              <div className="absolute inset-0 flex items-center justify-center">
-                <img src={talent.avatar} alt={talent.name} className="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-700" />
-              </div>
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 to-transparent"></div>
-              </div>
-              <div className="absolute bottom-4 left-4">
-          <h3 className="text-xl font-bold text-white">{talent.name}</h3>
-          <p className="text-xs text-violet-300 font-semibold uppercase tracking-wider">{talent.genre} • {talent.age} ANS</p>
+    <div className="glass rounded-3xl overflow-hidden group hover:shadow-2xl transition-all duration-300 flex flex-col">
+      <div className="relative h-72 overflow-hidden">
+        {/* Blurred background fills the card so there are no side gaps */}
+        <img src={talent.avatar} alt={`bg-${talent.name}`} className="absolute inset-0 w-full h-full object-cover filter blur-sm scale-105" />
+
+        {/* Foreground image centered and fully visible (no cropping) */}
+        <div className="absolute inset-0 flex items-center justify-center">
+          <img src={talent.avatar} alt={talent.name} className="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-700" />
+        </div>
+
+        {/* Small translucent name panel to avoid covering the image */}
+        <div className="absolute bottom-4 left-4">
+          <div className="bg-black/40 backdrop-blur-sm px-3 py-2 rounded-md">
+            <h3 className="text-xl font-bold text-white leading-tight">{talent.name}</h3>
+            <p className="text-xs text-white/70 font-semibold uppercase tracking-wider mt-0.5">{talent.genre} • {talent.age} ANS</p>
+          </div>
         </div>
       </div>
 
