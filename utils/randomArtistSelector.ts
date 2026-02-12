@@ -33,31 +33,7 @@ const frenchArtists = [
   "Naomie Larme – Emo rap / sad trap",
   "Augustin Fiel – Chanson réaliste moderne",
   "Pénélope Étoile Noire – Witch house / dark pop",
-  "Tancrède Luno – Rock psychédélique français",
-  "Ylanne Mirage – Future bass / melodic dubstep",
-  "Dorian Cendre – Rap poétique / cloud rap littéraire",
-  "Léonie Brisante – Grunge pop / riot grrrl",
-  "Mathias Ombre claire – Downtempo / trip-hop français",
-  "Stella Ferrum – Metalcore français / screamo",
-  "Calixte Néon – French hyperpop / digicore",
-  "Alma Vif-Éclat – Latin pop / reggaeton francophone",
-  "Noé Lumen – Indie rock lumineux / jangle pop",
-  "Océane Murmure – ASMR pop / whisper pop",
-  "Raphaël Ciel Rouge – Post-hardcore français",
-  "Esmée Phantom – Électro dark / witch pop",
-  "Lior Safran – Oriental trap / rap maghrébin",
-  "Violette Ardoise – Shoegaze dreamy",
-  "Thaddée Blizzard – Coldpop / glacial indie",
-  "Salomé Vortex – Breakbeat / jungle revival",
-  "Jules Éphémère – Variété nostalgique / yéyé 2.0",
-  "Känø – Plugg français / opium wave",
-  "Azureen – Siren pop / ethereal wave",
-  "Mvne – Rage plugg / drill européen",
-  "Lysø – Glitchcore sentimental",
-  "9lune – Sad hyperpop",
-  "Ørbit – Space bass / alien trap",
-  "VØID少女 – J-pop français / kawaii future bass",
-  "Cielchrome – Cyber chanson française"
+  "Tancrède Luno – Rock psychédélique français"
 ];
 
 // Fonction pour sélectionner aléatoirement 3 artistes

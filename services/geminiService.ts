@@ -18,6 +18,7 @@ import { indiaArtists } from "../utils/randomArtistSelectorIndia";
 import { mexicoArtists } from "../utils/randomArtistSelectorMexico";
 import { italyArtists } from "../utils/randomArtistSelectorItaly";
 import { spainArtists } from "../utils/randomArtistSelectorSpain";
+import { getArtistAvatar } from "../utils/artistPhotos";
 
 // Générateur de noms fictifs inspiré par Grok (logique créative et variée)
 function generateArtistName(countryName: string, seed: number): string {
@@ -204,7 +205,7 @@ export async function generateTalentsForCountry(countryName: string): Promise<Pa
       requestedRoyalty: Math.round(royaltyBase * 10) / 10,
       id: `${countryName}-${name.replace(/\s+/g, '-').toLowerCase()}-${seed}`,
       country: countryName,
-      avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(name + seed)}`,
+      avatar: getArtistAvatar(name),
       totalRevenue: 0,
       popularity: baseStats.fame,
       relationship: 50,
