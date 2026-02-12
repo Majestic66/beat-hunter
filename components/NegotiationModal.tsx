@@ -176,7 +176,7 @@ const NegotiationModal: React.FC<NegotiationModalProps> = ({ talent, gameState, 
                 type="range"
                 min="0"
                 max={gameState.budget}
-                step="1000"
+                step="100"
                 value={offerAdvance}
                 onChange={(e) => setOfferAdvance(Number(e.target.value))}
                 disabled={dealStatus !== 'negotiating'}
