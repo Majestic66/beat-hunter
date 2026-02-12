@@ -5,6 +5,7 @@ import { Talent, Genre, Personality, Release } from "../types";
 import { frenchArtists } from "../utils/randomArtistSelector";
 import { usArtists } from "../utils/randomArtistSelectorUS";
 import { japanArtists } from "../utils/randomArtistSelectorJapan";
+import { brazilArtists } from "../utils/randomArtistSelectorBrazil";
 
 // Générateur de noms fictifs inspiré par Grok (logique créative et variée)
 function generateArtistName(countryName: string, seed: number): string {
@@ -22,6 +23,11 @@ function generateArtistName(countryName: string, seed: number): string {
     // Utiliser la liste des artistes japonais fournie
     const index = seed % japanArtists.length;
     return japanArtists[index].split(' → ')[0]; // Prendre seulement le nom, pas le style
+  }
+  if (countryName === 'Brazil') {
+    // Utiliser la liste des artistes brésiliens fournie
+    const index = seed % brazilArtists.length;
+    return brazilArtists[index].split(' – ')[0]; // Prendre seulement le nom, pas le style
   }
 
   const prefixes = {
