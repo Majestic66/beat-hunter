@@ -83,7 +83,7 @@ const NegotiationModal: React.FC<NegotiationModalProps> = ({ talent, gameState, 
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md">
-      <div className="w-full max-w-4xl h-[85vh] glass rounded-[2.5rem] border border-white/10 overflow-hidden flex shadow-2xl">
+      <div className="w-full max-w-4xl h-[85vh] glass rounded-[2.5rem] border border-white/10 overflow-hidden flex flex-col md:flex-row shadow-2xl">
         
         <div className="flex-1 flex flex-col bg-slate-900/30">
           <div className="p-6 border-b border-white/10 flex justify-between items-center bg-slate-900/50">
@@ -160,7 +160,7 @@ const NegotiationModal: React.FC<NegotiationModalProps> = ({ talent, gameState, 
           </div>
         </div>
 
-        <div className="w-80 bg-slate-900 border-l border-white/10 p-8 flex flex-col gap-6 overflow-y-auto max-h-full">
+        <div className="w-full md:w-80 bg-slate-900 p-6 md:p-8 flex flex-col gap-6 overflow-y-auto max-h-[40vh] md:max-h-full md:border-l md:border-white/10">
           <h2 className="text-xl font-bold text-white tracking-tight uppercase">Termes du Contrat</h2>
           
           <div className="space-y-6">

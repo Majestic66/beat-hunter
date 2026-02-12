@@ -19,7 +19,7 @@ import CareerMode from './components/CareerMode';
 import { GameState, Talent, Release, GameEvent, Equipment, Achievement, Skill, SkillType, RivalLabel, Quest, WeatherEffect, CareerMilestone, MiniGameResult } from './types';
 import { generateTalentsForCountry, generateGlobalNews, generateRandomEvent, generateCollaboration, generateSpecialization, generateExtendedChatResponse, updateAllSACEMRevenues, ageArtists, calculateSACEMRevenue } from './services/geminiService';
 import { INITIAL_BUDGET, INITIAL_REPUTATION, ACHIEVEMENTS, MARKET_TRENDS } from './constants';
-import { Loader2, Music, Building2, Calendar, ShoppingBag, Zap, Gamepad2, Crown, Scroll, Cloud, Save, BarChart3, Trophy } from 'lucide-react';
+import { Loader2, Music, Building2, Calendar, ShoppingBag, Zap, Gamepad2, Crown, Scroll, Cloud, Save, BarChart3, Trophy, Menu, X } from 'lucide-react';
 
 const App: React.FC = () => {
   const [gameState, setGameState] = useState<GameState>({
@@ -121,6 +121,7 @@ const App: React.FC = () => {
 
   const [scoutingResults, setScoutingResults] = useState<Partial<Talent>[]>([]);
   const [isScouting, setIsScouting] = useState(false);
+  const [showSidebarMobile, setShowSidebarMobile] = useState(false);
   const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
   const [activeNegotiation, setActiveNegotiation] = useState<Partial<Talent> | null>(null);
   const [managedArtistId, setManagedArtistId] = useState<string | null>(null);
@@ -536,15 +537,32 @@ const App: React.FC = () => {
   const currentManagedArtist = gameState.signedArtists.find(a => a.id === managedArtistId);
 
   return (
-    <div className="flex h-screen w-full bg-slate-950 text-slate-100 overflow-hidden font-sans">
-      <Sidebar 
-        gameState={gameState} 
-        onSelectArtist={(artist) => setManagedArtistId(artist.id)}
-      />
+    <div className="flex flex-col md:flex-row h-screen w-full bg-slate-950 text-slate-100 overflow-hidden font-sans">
+      {/* Desktop sidebar */}
+      <div className="hidden md:block">
+        <Sidebar 
+          gameState={gameState} 
+          onSelectArtist={(artist) => setManagedArtistId(artist.id)}
+        />
+      </div>
+
+      {/* Mobile sidebar overlay */}
+      {showSidebarMobile && (
+        <div className="fixed inset-0 z-50 md:hidden">
+          <div className="absolute inset-0 bg-black/50" onClick={() => setShowSidebarMobile(false)} />
+          <div className="absolute left-0 top-0 bottom-0 w-80 max-w-full">
+            <Sidebar gameState={gameState} onSelectArtist={(artist) => { setManagedArtistId(artist.id); setShowSidebarMobile(false); }} />
+          </div>
+        </div>
+      )}
 
       <main className="flex-1 relative flex flex-col h-full overflow-hidden">
         <div className="h-16 px-8 border-b border-white/10 flex items-center justify-between glass z-10 shrink-0">
           <div className="flex items-center gap-6">
+            {/* Mobile menu button */}
+            <button onClick={() => setShowSidebarMobile(true)} className="md:hidden p-2 bg-white/5 rounded-lg">
+              <Menu className="w-5 h-5 text-white" />
+            </button>
             <div className="flex flex-col">
               <span className="text-[10px] font-black text-violet-500 uppercase tracking-widest">{gameState.labelName}</span>
               <div className="flex items-center gap-2">
