@@ -15,9 +15,12 @@ const Sidebar: React.FC<SidebarProps> = ({ gameState, onSelectArtist }) => {
         <div className="bg-violet-600 p-2 rounded-lg neon-border">
           <Music className="text-white w-6 h-6" />
         </div>
-        <h1 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-violet-400 to-fuchsia-400 tracking-tighter">
-          BEAT HUNTER PRO
-        </h1>
+        <div className="flex flex-col">
+          <h1 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-violet-400 to-fuchsia-400 tracking-tighter">
+            BEAT HUNTER PRO
+          </h1>
+          <span className="text-[8px] font-medium text-slate-400 uppercase tracking-wider mt-1">Créé par Roseval Design</span>
+        </div>
       </div>
 
       <div className="space-y-4">

@@ -512,6 +512,7 @@ const App: React.FC = () => {
           <div className="text-center space-y-2">
             <Building2 className="w-16 h-16 text-violet-500 mx-auto mb-4" />
             <h1 className="text-4xl font-black text-white italic tracking-tighter uppercase">Fonde ton label</h1>
+            <span className="text-sm font-medium text-slate-400 uppercase tracking-wider">Créé par Roseval Design</span>
           </div>
           <div className="space-y-4">
             <input 
@@ -550,7 +551,6 @@ const App: React.FC = () => {
                  <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
                  <span className="text-xs font-bold text-slate-300 uppercase">Connecté</span>
               </div>
-              <span className="text-[8px] font-medium text-slate-400 uppercase tracking-wider mt-1">Créé par Roseval Design</span>
             </div>
             {selectedCountry && (
                 <div className="text-sm bg-white/5 px-4 py-1.5 rounded-full border border-white/5 uppercase font-bold text-[10px] text-slate-300">
