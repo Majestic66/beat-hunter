@@ -16,7 +16,11 @@ const NegotiationModal: React.FC<NegotiationModalProps> = ({ talent, gameState, 
     { role: 'model', text: `Salut, je suis ${talent.name}. Mon manager m'a dit que tu cherchais du sang neuf. C'est quoi ta proposition ?` }
   ]);
   const [userInput, setUserInput] = useState("");
-  const [offerAdvance, setOfferAdvance] = useState(talent.requestedAdvance);
+  const [offerAdvance, setOfferAdvance] = useState(() => {
+    const initial = talent.requestedAdvance;
+    const rounded = Math.round(initial / 5000) * 5000;
+    return Math.min(rounded, gameState.budget);
+  });
   const [offerRoyalty, setOfferRoyalty] = useState(talent.requestedRoyalty);
   const [isTyping, setIsTyping] = useState(false);
   const [dealStatus, setDealStatus] = useState<'negotiating' | 'accepted' | 'rejected'>('negotiating');
@@ -177,7 +181,12 @@ const NegotiationModal: React.FC<NegotiationModalProps> = ({ talent, gameState, 
                 max={gameState.budget}
                 step="5000"
                 value={offerAdvance}
-                onChange={(e) => setOfferAdvance(Number(e.target.value))}
+                onChange={(e) => {
+                  const newValue = Number(e.target.value);
+                  const roundedValue = Math.round(newValue / 5000) * 5000;
+                  const clampedValue = Math.min(roundedValue, gameState.budget);
+                  setOfferAdvance(clampedValue);
+                }}
                 disabled={dealStatus !== 'negotiating'}
                 className="w-full accent-violet-600 h-1.5 bg-white/10 rounded-lg appearance-none cursor-pointer"
               />
@@ -196,7 +205,10 @@ const NegotiationModal: React.FC<NegotiationModalProps> = ({ talent, gameState, 
                 max="50"
                 step="1"
                 value={offerRoyalty}
-                onChange={(e) => setOfferRoyalty(Number(e.target.value))}
+                onChange={(e) => {
+                  const newValue = Number(e.target.value);
+                  setOfferRoyalty(newValue);
+                }}
                 disabled={dealStatus !== 'negotiating'}
                 className="w-full accent-violet-600 h-1.5 bg-white/10 rounded-lg appearance-none cursor-pointer"
               />
