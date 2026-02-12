@@ -1,0 +1,7 @@
+{
+  "name": "Global Beat Hunter: Pro Producer",
+  "description": "An immersive music industry simulator where you travel the world to scout, negotiate, and sign the next global superstars using AI-driven negotiations.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}

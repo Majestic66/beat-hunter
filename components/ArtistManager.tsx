@@ -1,0 +1,332 @@
+
+import React, { useState, useEffect, useRef } from 'react';
+import { Talent, GameState, Release } from '../types';
+import { generateReleaseResult, generateCoverArt, getArtistChatResponse } from '../services/geminiService';
+import ArtistStats from './ArtistStats';
+import {
+  Music, TrendingUp, DollarSign, Award, Loader2, Sparkles,
+  ArrowLeft, Target, Share2, Rocket, MessageSquare, Users,
+  Heart, History, Send, Percent, X, BarChart3
+} from 'lucide-react';
+
+interface ArtistManagerProps {
+  artist: Talent;
+  gameState: GameState;
+  onBack: () => void;
+  onUpdateState: (update: any) => void;
+}
+
+const ArtistManager: React.FC<ArtistManagerProps> = ({ artist, gameState, onBack, onUpdateState }) => {
+  const [activeTab, setActiveTab] = useState<'studio' | 'chat' | 'history' | 'stats'>('stats');
+  const [isReleasing, setIsReleasing] = useState(false);
+  const [strategy, setStrategy] = useState("Virale (TikTok/Reels)");
+  const [lastRelease, setLastRelease] = useState<Release | null>(null);
+  
+  // Chat state
+  const [chatMessages, setChatMessages] = useState<{ role: 'user' | 'model', text: string }[]>([
+    { role: 'model', text: `Yo boss ! Content de te voir. Qu'est-ce qu'on prépare aujourd'hui ?` }
+  ]);
+  const [userInput, setUserInput] = useState("");
+  const [isTyping, setIsTyping] = useState(false);
+  const [chatContext, setChatContext] = useState<'chat' | 'renegotiate' | 'collab'>('chat');
+  
+  // Collaboration state
+  const [showCollabSelector, setShowCollabSelector] = useState(false);
+  const [selectedCollab, setSelectedCollab] = useState<Talent | null>(null);
+
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+  }, [chatMessages, isTyping]);
+
+  const handleSendMessage = async () => {
+    if (!userInput.trim() || isTyping) return;
+    const newMsgs = [...chatMessages, { role: 'user' as const, text: userInput }];
+    setChatMessages(newMsgs);
+    setUserInput("");
+    setIsTyping(true);
+
+    try {
+      const res = await getArtistChatResponse(artist, newMsgs, chatContext, { 
+        labelName: gameState.labelName,
+        collabArtist: selectedCollab 
+      });
+      setChatMessages(prev => [...prev, { role: 'model' as const, text: res.reply }]);
+      onUpdateState({ 
+        type: 'RELATIONSHIP_CHANGE', 
+        artistId: artist.id, 
+        amount: res.relationshipChange 
+      });
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsTyping(false);
+    }
+  };
+
+  const handleRelease = async () => {
+    setIsReleasing(true);
+    try {
+      const collaborators = selectedCollab ? [selectedCollab] : [];
+      const release = await generateReleaseResult(artist, strategy, collaborators);
+      const cover = await generateCoverArt(release.songTitle, artist.genre);
+      const finalRelease = { ...release, cover };
+      
+      setLastRelease(finalRelease);
+      onUpdateState({ type: 'NEW_RELEASE', artistId: artist.id, release: finalRelease });
+      setSelectedCollab(null);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsReleasing(false);
+    }
+  };
+
+  const tabs = [
+    { id: 'stats', label: 'Statistiques', icon: <BarChart3 className="w-4 h-4" /> },
+    { id: 'studio', label: 'Studio', icon: <Music className="w-4 h-4" /> },
+    { id: 'chat', label: 'Discuter', icon: <MessageSquare className="w-4 h-4" /> },
+    { id: 'history', label: 'Discographie', icon: <History className="w-4 h-4" /> }
+  ];
+
+  return (
+    <div className="flex flex-col h-full bg-slate-950 overflow-hidden">
+      {/* Header Profile */}
+      <div className="p-8 border-b border-white/10 flex items-center justify-between glass shrink-0">
+        <div className="flex items-center gap-6">
+          <button onClick={onBack} className="p-3 bg-white/5 rounded-full hover:bg-white/10 transition-colors">
+            <ArrowLeft className="w-5 h-5" />
+          </button>
+          <img src={artist.avatar} className="w-16 h-16 rounded-2xl object-cover border-2 border-violet-500 shadow-lg" />
+          <div>
+            <h1 className="text-3xl font-black italic tracking-tighter text-white">{artist.name}</h1>
+            <div className="flex gap-2 items-center">
+              <span className="text-xs font-bold text-violet-400 uppercase">{artist.genre}</span>
+              <span className="text-slate-500 text-xs">•</span>
+              <div className="flex items-center gap-1">
+                <Heart className={`w-3 h-3 ${artist.relationship > 70 ? 'text-rose-500 fill-rose-500' : 'text-slate-500'}`} />
+                <span className="text-[10px] font-bold text-slate-300 uppercase">{artist.relationship}% Loyauté</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="flex bg-white/5 p-1 rounded-2xl border border-white/5">
+          {tabs.map(t => (
+            <button
+              key={t.id}
+              onClick={() => setActiveTab(t.id as any)}
+              className={`flex items-center gap-2 px-6 py-2 rounded-xl text-xs font-bold transition-all ${
+                activeTab === t.id ? 'bg-violet-600 text-white shadow-lg shadow-violet-600/20' : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              {t.icon} {t.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="flex-1 overflow-hidden relative">
+        {/* Stats View */}
+        {activeTab === 'stats' && (
+          <div className="p-6 h-full overflow-y-auto">
+            <ArtistStats artist={artist} gameState={gameState} onUpdateState={onUpdateState} />
+          </div>
+        )}
+
+        {/* Studio View */}
+        {activeTab === 'studio' && (
+          <div className="p-10 h-full overflow-y-auto space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+              <div className="space-y-8">
+                <div className="bg-white/5 p-8 rounded-[2.5rem] border border-white/5 space-y-6">
+                  <h3 className="text-xl font-black uppercase tracking-widest text-slate-200 flex items-center gap-2">
+                    <Rocket className="w-5 h-5 text-violet-500" /> Préparer une sortie
+                  </h3>
+                  
+                  <div className="space-y-4">
+                    <p className="text-xs font-bold text-slate-500 uppercase">Stratégie</p>
+                    <div className="grid grid-cols-2 gap-3">
+                      {["Virale (TikTok)", "Studio (Hi-Fi)", "Buzz de Rue", "Niche Artistique"].map(s => (
+                        <button
+                          key={s}
+                          onClick={() => setStrategy(s)}
+                          className={`p-4 rounded-2xl border text-left transition-all ${
+                            strategy === s ? 'bg-violet-600/20 border-violet-500 text-white' : 'bg-white/5 border-white/5 text-slate-400 hover:border-white/10'
+                          }`}
+                        >
+                          <span className="text-sm font-bold">{s}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="space-y-4">
+                    <p className="text-xs font-bold text-slate-500 uppercase">Collaboration</p>
+                    {selectedCollab ? (
+                      <div className="flex items-center justify-between bg-violet-600/20 border border-violet-500/30 p-4 rounded-2xl">
+                        <div className="flex items-center gap-3">
+                          <img src={selectedCollab.avatar} className="w-8 h-8 rounded-full" />
+                          <span className="font-bold text-white">{selectedCollab.name}</span>
+                        </div>
+                        <button onClick={() => setSelectedCollab(null)} className="p-1 hover:bg-white/10 rounded-full">
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                    ) : (
+                      <button 
+                        onClick={() => setShowCollabSelector(true)}
+                        className="w-full p-4 rounded-2xl bg-white/5 border border-white/5 text-slate-400 hover:border-white/10 flex items-center justify-center gap-2 font-bold text-sm"
+                      >
+                        <Users className="w-4 h-4" /> Ajouter un invité du label
+                      </button>
+                    )}
+                  </div>
+
+                  <button 
+                    onClick={handleRelease}
+                    disabled={isReleasing}
+                    className="w-full py-5 bg-gradient-to-r from-violet-600 to-fuchsia-600 rounded-3xl text-white font-black text-xl shadow-xl shadow-violet-600/30 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3 disabled:opacity-50"
+                  >
+                    {isReleasing ? <Loader2 className="w-6 h-6 animate-spin" /> : <Music className="w-6 h-6" />}
+                    {isReleasing ? "ENREGISTREMENT..." : "LANCER LE SINGLE"}
+                  </button>
+                </div>
+              </div>
+
+              <div className="space-y-6">
+                {lastRelease ? (
+                  <div className="bg-slate-900 border-2 border-violet-500/30 p-8 rounded-[3rem] animate-in zoom-in-95 duration-700 shadow-2xl">
+                    <img src={lastRelease.cover} className="w-full aspect-square rounded-2xl mb-6 shadow-2xl" />
+                    <h2 className="text-3xl font-black text-white italic">"{lastRelease.songTitle}"</h2>
+                    <p className="text-slate-400 mt-2 text-sm leading-relaxed">{lastRelease.impact}</p>
+                    <div className="grid grid-cols-2 gap-4 mt-8">
+                       <div className="p-4 bg-white/5 rounded-2xl">
+                         <p className="text-[10px] font-bold text-slate-500 uppercase">Revenu</p>
+                         <p className="text-xl font-bold text-emerald-400">+{lastRelease.revenue.toLocaleString()}€</p>
+                       </div>
+                       <div className="p-4 bg-white/5 rounded-2xl">
+                         <p className="text-[10px] font-bold text-slate-500 uppercase">Buzz</p>
+                         <p className="text-xl font-bold text-amber-400">{lastRelease.buzz}/100</p>
+                       </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="h-full flex flex-col items-center justify-center text-slate-600 opacity-50 border-2 border-dashed border-white/5 rounded-[3rem]">
+                    <Sparkles className="w-16 h-16 mb-4" />
+                    <p className="text-sm font-bold uppercase tracking-widest">En attente d'une sortie</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Chat View */}
+        {activeTab === 'chat' && (
+          <div className="h-full flex flex-col p-6 animate-in fade-in duration-300">
+             <div className="flex gap-2 mb-6 justify-center">
+                {['chat', 'renegotiate', 'collab'].map((c: any) => (
+                  <button
+                    key={c}
+                    onClick={() => setChatContext(c)}
+                    className={`px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest border transition-all ${
+                      chatContext === c ? 'bg-violet-600 border-violet-500 text-white' : 'bg-white/5 border-white/10 text-slate-500'
+                    }`}
+                  >
+                    {c === 'chat' ? 'Discussion' : c === 'renegotiate' ? 'Contrat' : 'Collaboration'}
+                  </button>
+                ))}
+             </div>
+             
+             <div ref={scrollRef} className="flex-1 overflow-y-auto space-y-6 px-10">
+                {chatMessages.map((m, i) => (
+                  <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                    <div className={`max-w-[70%] p-5 rounded-3xl ${
+                      m.role === 'user' ? 'bg-violet-600 text-white rounded-tr-none' : 'bg-white/5 text-slate-200 rounded-tl-none border border-white/10'
+                    }`}>
+                      {m.text}
+                    </div>
+                  </div>
+                ))}
+                {isTyping && <div className="text-xs text-slate-500 animate-pulse italic">{artist.name} est en train d'écrire...</div>}
+             </div>
+
+             <div className="p-6 bg-slate-900/50 rounded-b-[3rem] mt-6">
+                <div className="flex gap-4 max-w-4xl mx-auto">
+                   <input 
+                      value={userInput}
+                      onChange={(e) => setUserInput(e.target.value)}
+                      onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+                      placeholder="Tapez votre message..."
+                      className="flex-1 bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-white focus:outline-none focus:border-violet-500"
+                   />
+                   <button onClick={handleSendMessage} className="p-4 bg-violet-600 rounded-2xl hover:bg-violet-500 transition-all">
+                      <Send className="w-5 h-5" />
+                   </button>
+                </div>
+             </div>
+          </div>
+        )}
+
+        {/* Discography View */}
+        {activeTab === 'history' && (
+          <div className="p-10 h-full overflow-y-auto animate-in fade-in duration-300">
+             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                {artist.releaseHistory.length === 0 ? (
+                  <p className="col-span-full text-center text-slate-600 py-20 font-bold uppercase">Aucune sortie enregistrée.</p>
+                ) : (
+                  artist.releaseHistory.map(r => (
+                    <div key={r.id} className="glass p-6 rounded-3xl border border-white/5 flex gap-4 hover:border-white/10 transition-all">
+                       <img src={r.cover} className="w-20 h-20 rounded-xl object-cover shrink-0" />
+                       <div className="flex-1 min-w-0">
+                          <h4 className="font-bold text-white truncate">"{r.songTitle}"</h4>
+                          <div className="flex items-center gap-2 mt-1">
+                             <TrendingUp className="w-3 h-3 text-amber-500" />
+                             <span className="text-[10px] font-bold text-slate-400">{r.buzz}/100 Buzz</span>
+                          </div>
+                          <p className="text-[10px] text-emerald-500 font-bold mt-2">+{r.revenue.toLocaleString()}€ gagnés</p>
+                       </div>
+                    </div>
+                  ))
+                )}
+             </div>
+          </div>
+        )}
+      </div>
+
+      {/* Collab Selector Modal */}
+      {showCollabSelector && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-slate-950/90 backdrop-blur-sm">
+          <div className="max-w-md w-full glass p-8 rounded-[3rem] border border-white/10 space-y-6">
+            <div className="flex justify-between items-center">
+              <h2 className="text-xl font-black text-white italic">CHOISIR UN PARTENAIRE</h2>
+              <button onClick={() => setShowCollabSelector(false)} className="p-2 hover:bg-white/10 rounded-full"><X /></button>
+            </div>
+            <div className="space-y-3 max-h-60 overflow-y-auto pr-2">
+              {gameState.signedArtists
+                .filter(a => a.id !== artist.id)
+                .map(a => (
+                <button
+                  key={a.id}
+                  onClick={() => { setSelectedCollab(a); setShowCollabSelector(false); }}
+                  className="w-full flex items-center gap-4 p-4 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/5 transition-all"
+                >
+                  <img src={a.avatar} className="w-10 h-10 rounded-full" />
+                  <div className="text-left">
+                    <p className="font-bold text-white">{a.name}</p>
+                    <p className="text-[10px] text-slate-500 uppercase">{a.genre} • {a.popularity}% Pop.</p>
+                  </div>
+                </button>
+              ))}
+              {gameState.signedArtists.length <= 1 && <p className="text-center text-slate-500 text-sm italic">Vous avez besoin d'autres artistes dans votre label.</p>}
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default ArtistManager;
