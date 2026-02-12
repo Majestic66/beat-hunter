@@ -61,7 +61,7 @@ const Sidebar: React.FC<SidebarProps> = ({ gameState, onSelectArtist }) => {
                 onClick={() => onSelectArtist(artist)}
                 className="group relative flex items-center gap-3 p-2 rounded-lg hover:bg-violet-600/20 transition-all cursor-pointer border border-transparent hover:border-violet-500/30"
               >
-                <img src={artist.avatar} alt={artist.name} className="w-10 h-10 aspect-square rounded-md object-contain grayscale group-hover:grayscale-0 transition-all bg-slate-800" />
+                <img src={artist.avatar} alt={artist.name} className="w-10 h-10 aspect-square rounded-md object-cover grayscale group-hover:grayscale-0 transition-all" />
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-semibold truncate text-slate-200">{artist.name}</p>
                   <p className="text-[10px] text-slate-400 uppercase">{artist.genre} • {artist.potential}% Pot.</p>

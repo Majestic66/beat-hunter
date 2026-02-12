@@ -12,7 +12,7 @@ const TalentCard: React.FC<TalentCardProps> = ({ talent, onNegotiate }) => {
   return (
     <div className="glass rounded-2xl overflow-hidden border border-white/10 group hover:border-violet-500/50 transition-all duration-300 flex flex-col">
       <div className="relative h-48 overflow-hidden">
-        <img src={talent.avatar} alt={talent.name} className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-700" />
+        <img src={talent.avatar} alt={talent.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 object-center" />
         <div className="absolute inset-0 bg-gradient-to-t from-slate-950 to-transparent"></div>
         <div className="absolute bottom-4 left-4">
           <h3 className="text-xl font-bold text-white">{talent.name}</h3>

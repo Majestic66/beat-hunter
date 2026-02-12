@@ -125,7 +125,7 @@ const ArtistManager: React.FC<ArtistManagerProps> = ({ artist, gameState, onBack
           <button onClick={onBack} className="p-3 bg-white/5 rounded-full hover:bg-white/10 transition-colors">
             <ArrowLeft className="w-5 h-5" />
           </button>
-          <img src={artist.avatar} className="w-20 h-20 aspect-square rounded-md object-contain border-2 border-violet-500 shadow-lg bg-slate-800" />
+          <img src={artist.avatar} className="w-20 h-20 aspect-square rounded-2xl object-cover border-0 shadow-lg" />
           <div>
             <h1 className="text-3xl font-black italic tracking-tighter text-white">{artist.name}</h1>
             <div className="flex gap-2 items-center">
@@ -216,7 +216,7 @@ const ArtistManager: React.FC<ArtistManagerProps> = ({ artist, gameState, onBack
                     {selectedCollab ? (
                       <div className="flex items-center justify-between bg-violet-600/20 border border-violet-500/30 p-4 rounded-2xl">
                         <div className="flex items-center gap-3">
-                          <img src={selectedCollab.avatar} className="w-8 h-8 aspect-square rounded-md object-contain bg-slate-800" />
+                          <img src={selectedCollab.avatar} className="w-8 h-8 aspect-square rounded-full object-cover" />
                           <span className="font-bold text-white">{selectedCollab.name}</span>
                         </div>
                         <button onClick={() => setSelectedCollab(null)} className="p-1 hover:bg-white/10 rounded-full">

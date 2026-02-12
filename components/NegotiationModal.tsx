@@ -88,7 +88,7 @@ const NegotiationModal: React.FC<NegotiationModalProps> = ({ talent, gameState, 
         <div className="flex-1 flex flex-col bg-slate-900/30">
           <div className="p-6 border-b border-white/10 flex justify-between items-center bg-slate-900/50">
             <div className="flex items-center gap-4">
-              <img src={talent.avatar} className="w-12 h-12 rounded-full border-2 border-violet-500" />
+              <img src={talent.avatar} className="w-12 h-12 rounded-full object-cover border-0" />
               <div>
                 <h3 className="font-bold text-lg text-white">{talent.name}</h3>
                 <p className="text-xs text-slate-400 uppercase tracking-widest font-bold">Négociation en direct</p>
