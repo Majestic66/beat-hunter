@@ -488,7 +488,11 @@ export async function generateReleaseResult(
 
   const reputationGain = Math.round(buzz / 12) + (collaborators.length * 3) + Math.floor(Math.random() * 5);
 
-  return {
+  // Estimer des streams basés sur le revenu (simple approximation)
+  const estimatedStreams = Math.max(0, Math.round(revenue * (5 + Math.random() * 10)));
+  const monthlyStreams = Math.max(0, Math.floor(estimatedStreams / 12));
+
+  const release: Release = {
     id: `rel-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
     songTitle,
     impact,
@@ -496,8 +500,21 @@ export async function generateReleaseResult(
     reputationGain,
     buzz,
     date: Date.now(),
-    collaborators: collaborators.map(c => c.id)
+    collaborators: collaborators.map(c => c.id),
+    streams: estimatedStreams,
+    monthlyStreams,
+    sacemRevenue: 0
   };
+
+  // Calculer une SACEM initiale basée sur les streams estimés et la popularité
+  try {
+    const initialSACEM = calculateSACEMRevenue(release, talent.popularity || 0);
+    release.sacemRevenue = initialSACEM;
+  } catch (e) {
+    // ignore calculation errors and keep sacemRevenue = 0
+  }
+
+  return release;
 }
 
 // Génération de couvertures d'album
@@ -712,14 +729,15 @@ export function calculateSACEMRevenue(release: Release, artistPopularity: number
 export function updateAllSACEMRevenues(artists: Talent[]): Talent[] {
   return artists.map(artist => {
     const updatedReleases = artist.releaseHistory.map(release => {
-      const monthlySACEM = calculateSACEMRevenue(release, artist.popularity || 0);
+      // S'assurer que monthlyStreams est initialisé avant de calculer la SACEM
+      const newMonthlyStreams = release.monthlyStreams || Math.floor(Math.random() * 100000) + 10000;
       const currentSACEM = release.sacemRevenue || 0;
+      const monthlySACEM = calculateSACEMRevenue({ ...release, monthlyStreams: newMonthlyStreams }, artist.popularity || 0);
 
       return {
         ...release,
         sacemRevenue: currentSACEM + monthlySACEM,
-        // Simuler l'évolution des streams mensuels
-        monthlyStreams: release.monthlyStreams || Math.floor(Math.random() * 100000) + 10000
+        monthlyStreams: newMonthlyStreams
       };
     });
 
