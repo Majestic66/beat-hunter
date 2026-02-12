@@ -52,21 +52,6 @@ const WorldMap: React.FC<WorldMapProps> = ({ onCountryClick, selectedCountry }) 
             </div>
         </div>
       </div>
-      
-      <div className="absolute bottom-10 left-1/2 -translate-x-1/2 glass px-8 py-3 rounded-full border border-white/10 flex items-center gap-12 text-sm font-medium">
-          <div className="flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
-              <span className="text-slate-400">Satellites Actifs</span>
-          </div>
-          <div className="flex items-center gap-2">
-              <span className="text-slate-500">Latence Réseau :</span>
-              <span className="text-violet-400">14ms</span>
-          </div>
-          <div className="flex items-center gap-2">
-              <span className="text-slate-500">Tendance Marché :</span>
-              <span className="text-emerald-400 font-bold uppercase">Favorable</span>
-          </div>
-      </div>
     </div>
   );
 };

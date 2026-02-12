@@ -17,11 +17,7 @@ export const COUNTRIES = [
   { id: 'IND', name: 'India', coords: [20, 78] },
   { id: 'MEX', name: 'Mexico', coords: [23, -102] },
   { id: 'ITA', name: 'Italy', coords: [41, 12] },
-  { id: 'ESP', name: 'Spain', coords: [40, -4] },
-  { id: 'RUS', name: 'Russia', coords: [61, 105] },
-  { id: 'CHN', name: 'China', coords: [35, 105] },
-  { id: 'ARG', name: 'Argentina', coords: [-38, -63] },
-  { id: 'EGY', name: 'Egypt', coords: [26, 30] }
+  { id: 'ESP', name: 'Spain', coords: [40, -4] }
 ];
 
 export const GENRES = [
