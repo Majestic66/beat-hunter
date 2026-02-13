@@ -22,12 +22,24 @@ const NegotiationModal: React.FC<NegotiationModalProps> = ({ talent, gameState, 
   const [dealStatus, setDealStatus] = useState<'negotiating' | 'accepted' | 'rejected'>('negotiating');
   
   const scrollRef = useRef<HTMLDivElement>(null);
+  const acceptedRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (scrollRef.current) {
+      // always scroll to bottom when new messages arrive
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
-  }, [messages, isTyping]);
+
+    // if the deal was accepted, make sure the acceptance panel is visible
+    if (dealStatus === 'accepted' && acceptedRef.current) {
+      try {
+        acceptedRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      } catch (e) {
+        // fallback: set container scroll to bottom
+        if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+      }
+    }
+  }, [messages, isTyping, dealStatus]);
 
   const handleSendMessage = async () => {
     if (!userInput.trim() || isTyping || dealStatus !== 'negotiating') return;
@@ -101,7 +113,7 @@ const NegotiationModal: React.FC<NegotiationModalProps> = ({ talent, gameState, 
 
           <div
             ref={scrollRef}
-            className="flex-1 overflow-y-auto p-6 space-y-6"
+            className="flex-1 overflow-y-auto p-6 pb-32 md:pb-6 space-y-6"
             style={{ touchAction: 'pan-y', WebkitOverflowScrolling: 'touch' as any }}
           >
             {messages.map((m, i) => (
@@ -125,7 +137,7 @@ const NegotiationModal: React.FC<NegotiationModalProps> = ({ talent, gameState, 
               </div>
             )}
             {dealStatus === 'accepted' && (
-              <div className="flex justify-center py-8">
+              <div ref={acceptedRef} className="flex justify-center py-8">
                 <div className="bg-emerald-500/10 border border-emerald-500/30 p-6 rounded-3xl flex flex-col items-center gap-4 text-center max-w-sm animate-in fade-in zoom-in duration-500">
                   <CheckCircle className="w-12 h-12 text-emerald-400" />
                   <div>
