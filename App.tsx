@@ -230,7 +230,17 @@ const App: React.FC = () => {
     setScoutingResults([]);
     try {
       const talents = await generateTalentsForCountry(countryName);
-      setScoutingResults(talents);
+      // Remove duplicates: artists already signed or repeated in the result
+      const existingIds = new Set(gameState.signedArtists.map(a => a.id));
+      const seen = new Set<string>();
+      const unique = talents.filter(t => {
+        if (!t.id) return false;
+        if (existingIds.has(t.id)) return false; // already signed
+        if (seen.has(t.id)) return false; // duplicate in this batch
+        seen.add(t.id);
+        return true;
+      });
+      setScoutingResults(unique);
     } catch (error) {
       setGameState(prev => ({ ...prev, notifications: [...prev.notifications, "Erreur quota API. Réessayez bientôt."] }));
     } finally {
