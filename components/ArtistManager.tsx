@@ -289,7 +289,11 @@ const ArtistManager: React.FC<ArtistManagerProps> = ({ artist, gameState, onBack
                 ))}
              </div>
              
-             <div ref={scrollRef} className="flex-1 overflow-y-auto space-y-4 md:space-y-6 px-2 md:px-10">
+             <div
+               ref={scrollRef}
+               className="flex-1 overflow-y-auto space-y-4 md:space-y-6 px-2 md:px-10"
+               style={{ touchAction: 'pan-y', WebkitOverflowScrolling: 'touch' as any }}
+             >
                 {chatMessages.map((m, i) => (
                   <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                     <div className={`max-w-[85%] md:max-w-[70%] p-3 md:p-5 rounded-2xl md:rounded-3xl text-sm md:text-base ${

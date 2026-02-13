@@ -99,7 +99,11 @@ const NegotiationModal: React.FC<NegotiationModalProps> = ({ talent, gameState, 
             </button>
           </div>
 
-          <div ref={scrollRef} className="flex-1 overflow-y-auto p-6 space-y-6">
+          <div
+            ref={scrollRef}
+            className="flex-1 overflow-y-auto p-6 space-y-6"
+            style={{ touchAction: 'pan-y', WebkitOverflowScrolling: 'touch' as any }}
+          >
             {messages.map((m, i) => (
               <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                 <div className={`max-w-[80%] p-4 rounded-2xl text-sm ${
