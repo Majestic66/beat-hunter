@@ -120,35 +120,35 @@ const ArtistManager: React.FC<ArtistManagerProps> = ({ artist, gameState, onBack
   return (
     <div className="flex flex-col h-full bg-slate-950 overflow-hidden">
       {/* Header Profile */}
-      <div className="p-8 border-b border-white/10 flex items-center justify-between glass shrink-0">
-        <div className="flex items-center gap-6">
-          <button onClick={onBack} className="p-3 bg-white/5 rounded-full hover:bg-white/10 transition-colors">
+      <div className="p-4 md:p-8 border-b border-white/10 flex flex-col md:flex-row items-start md:items-center justify-between glass shrink-0 gap-4">
+        <div className="flex items-center gap-3 md:gap-6 w-full md:w-auto">
+          <button onClick={onBack} className="p-2.5 md:p-3 bg-white/5 rounded-full hover:bg-white/10 active:bg-white/15 transition-colors touch-manipulation min-w-[44px] min-h-[44px] flex items-center justify-center">
             <ArrowLeft className="w-5 h-5" />
           </button>
-          <img src={artist.avatar} className="w-20 h-20 aspect-square rounded-2xl object-cover border-0 shadow-lg" />
-          <div>
-            <h1 className="text-3xl font-black italic tracking-tighter text-white">{artist.name}</h1>
-            <div className="flex gap-2 items-center">
-              <span className="text-xs font-bold text-violet-400 uppercase">{artist.genre}</span>
-              <span className="text-slate-500 text-xs">•</span>
+          <img src={artist.avatar} className="w-16 h-16 md:w-20 md:h-20 aspect-square rounded-xl md:rounded-2xl object-cover border-0 shadow-lg flex-shrink-0" />
+          <div className="min-w-0 flex-1">
+            <h1 className="text-xl md:text-3xl font-black italic tracking-tighter text-white truncate">{artist.name}</h1>
+            <div className="flex gap-2 items-center flex-wrap">
+              <span className="text-[10px] md:text-xs font-bold text-violet-400 uppercase">{artist.genre}</span>
+              <span className="text-slate-500 text-xs hidden sm:inline">•</span>
               <div className="flex items-center gap-1">
                 <Heart className={`w-3 h-3 ${artist.relationship > 70 ? 'text-rose-500 fill-rose-500' : 'text-slate-500'}`} />
-                <span className="text-[10px] font-bold text-slate-300 uppercase">{artist.relationship}% Loyauté</span>
+                <span className="text-[9px] md:text-[10px] font-bold text-slate-300 uppercase whitespace-nowrap">{artist.relationship}% Loyauté</span>
               </div>
             </div>
           </div>
         </div>
 
-        <div className="flex bg-white/5 p-1 rounded-2xl border border-white/5">
+        <div className="flex bg-white/5 p-1 rounded-xl md:rounded-2xl border border-white/5 w-full md:w-auto overflow-x-auto">
           {tabs.map(t => (
             <button
               key={t.id}
               onClick={() => setActiveTab(t.id as any)}
-              className={`flex items-center gap-2 px-6 py-2 rounded-xl text-xs font-bold transition-all ${
-                activeTab === t.id ? 'bg-violet-600 text-white shadow-lg shadow-violet-600/20' : 'text-slate-400 hover:text-white'
+              className={`flex items-center justify-center gap-1.5 md:gap-2 px-3 md:px-6 py-2.5 md:py-2 rounded-lg md:rounded-xl text-[10px] md:text-xs font-bold transition-all whitespace-nowrap touch-manipulation flex-1 md:flex-none ${
+                activeTab === t.id ? 'bg-violet-600 text-white shadow-lg shadow-violet-600/20' : 'text-slate-400 hover:text-white active:bg-white/5'
               }`}
             >
-              {t.icon} {t.label}
+              {t.icon} <span className="hidden sm:inline">{t.label}</span>
             </button>
           ))}
         </div>
@@ -157,15 +157,15 @@ const ArtistManager: React.FC<ArtistManagerProps> = ({ artist, gameState, onBack
       <div className="flex-1 overflow-hidden relative">
         {/* Stats View */}
         {activeTab === 'stats' && (
-          <div className="p-6 h-full overflow-y-auto">
+          <div className="p-4 md:p-6 h-full overflow-y-auto">
             <ArtistStats artist={artist} gameState={gameState} onUpdateState={onUpdateState} />
           </div>
         )}
 
         {/* Studio View */}
         {activeTab === 'studio' && (
-          <div className="p-10 h-full overflow-y-auto space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+          <div className="p-4 md:p-10 h-full overflow-y-auto space-y-6 md:space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-10">
               <div className="space-y-8">
                 <div className="bg-white/5 p-8 rounded-[2.5rem] border border-white/5 space-y-6">
                   <h3 className="text-xl font-black uppercase tracking-widest text-slate-200 flex items-center gap-2">
@@ -196,16 +196,16 @@ const ArtistManager: React.FC<ArtistManagerProps> = ({ artist, gameState, onBack
                       </div>
                     )}
                     <p className="text-xs font-bold text-slate-500 uppercase">Stratégie</p>
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 md:gap-3">
                       {["Virale (TikTok)", "Studio (Hi-Fi)", "Buzz de Rue", "Niche Artistique"].map(s => (
                         <button
                           key={s}
                           onClick={() => setStrategy(s)}
-                          className={`p-4 rounded-2xl border text-left transition-all ${
-                            strategy === s ? 'bg-violet-600/20 border-violet-500 text-white' : 'bg-white/5 border-white/5 text-slate-400 hover:border-white/10'
+                          className={`p-3 md:p-4 rounded-xl md:rounded-2xl border text-left transition-all touch-manipulation min-h-[52px] ${
+                            strategy === s ? 'bg-violet-600/20 border-violet-500 text-white' : 'bg-white/5 border-white/5 text-slate-400 hover:border-white/10 active:bg-white/10'
                           }`}
                         >
-                          <span className="text-sm font-bold">{s}</span>
+                          <span className="text-xs md:text-sm font-bold">{s}</span>
                         </button>
                       ))}
                     </div>
@@ -236,35 +236,35 @@ const ArtistManager: React.FC<ArtistManagerProps> = ({ artist, gameState, onBack
                   <button 
                     onClick={handleRelease}
                     disabled={isReleasing}
-                    className="w-full py-5 bg-gradient-to-r from-violet-600 to-fuchsia-600 rounded-3xl text-white font-black text-xl shadow-xl shadow-violet-600/30 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3 disabled:opacity-50"
+                    className="w-full py-4 md:py-5 bg-gradient-to-r from-violet-600 to-fuchsia-600 rounded-2xl md:rounded-3xl text-white font-black text-base md:text-xl shadow-xl shadow-violet-600/30 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2 md:gap-3 disabled:opacity-50 touch-manipulation min-h-[56px]"
                   >
-                    {isReleasing ? <Loader2 className="w-6 h-6 animate-spin" /> : <Music className="w-6 h-6" />}
+                    {isReleasing ? <Loader2 className="w-5 h-5 md:w-6 md:h-6 animate-spin" /> : <Music className="w-5 h-5 md:w-6 md:h-6" />}
                     {isReleasing ? "ENREGISTREMENT..." : "LANCER LE SINGLE"}
                   </button>
                 </div>
               </div>
 
-              <div className="space-y-6">
+              <div className="space-y-4 md:space-y-6">
                 {lastRelease ? (
-                  <div className="bg-slate-900 border-2 border-violet-500/30 p-8 rounded-[3rem] animate-in zoom-in-95 duration-700 shadow-2xl">
-                    <img src={lastRelease.cover} className="w-full aspect-square rounded-2xl mb-6 shadow-2xl" />
-                    <h2 className="text-3xl font-black text-white italic">"{lastRelease.songTitle}"</h2>
-                    <p className="text-slate-400 mt-2 text-sm leading-relaxed">{lastRelease.impact}</p>
-                    <div className="grid grid-cols-2 gap-4 mt-8">
-                       <div className="p-4 bg-white/5 rounded-2xl">
+                  <div className="bg-slate-900 border-2 border-violet-500/30 p-4 md:p-8 rounded-2xl md:rounded-[3rem] animate-in zoom-in-95 duration-700 shadow-2xl">
+                    <img src={lastRelease.cover} className="w-full aspect-square rounded-xl md:rounded-2xl mb-4 md:mb-6 shadow-2xl" />
+                    <h2 className="text-2xl md:text-3xl font-black text-white italic break-words">"{lastRelease.songTitle}"</h2>
+                    <p className="text-slate-400 mt-2 text-xs md:text-sm leading-relaxed">{lastRelease.impact}</p>
+                    <div className="grid grid-cols-2 gap-3 md:gap-4 mt-6 md:mt-8">
+                       <div className="p-3 md:p-4 bg-white/5 rounded-xl md:rounded-2xl">
                          <p className="text-[10px] font-bold text-slate-500 uppercase">Revenu</p>
-                         <p className="text-xl font-bold text-emerald-400">+{lastRelease.revenue.toLocaleString()}€</p>
+                         <p className="text-lg md:text-xl font-bold text-emerald-400">+{lastRelease.revenue.toLocaleString()}€</p>
                        </div>
-                       <div className="p-4 bg-white/5 rounded-2xl">
+                       <div className="p-3 md:p-4 bg-white/5 rounded-xl md:rounded-2xl">
                          <p className="text-[10px] font-bold text-slate-500 uppercase">Buzz</p>
-                         <p className="text-xl font-bold text-amber-400">{lastRelease.buzz}/100</p>
+                         <p className="text-lg md:text-xl font-bold text-amber-400">{lastRelease.buzz}/100</p>
                        </div>
                     </div>
                   </div>
                 ) : (
-                  <div className="h-full flex flex-col items-center justify-center text-slate-600 opacity-50 border-2 border-dashed border-white/5 rounded-[3rem]">
-                    <Sparkles className="w-16 h-16 mb-4" />
-                    <p className="text-sm font-bold uppercase tracking-widest">En attente d'une sortie</p>
+                  <div className="h-64 md:h-full flex flex-col items-center justify-center text-slate-600 opacity-50 border-2 border-dashed border-white/5 rounded-2xl md:rounded-[3rem] p-4">
+                    <Sparkles className="w-12 h-12 md:w-16 md:h-16 mb-4" />
+                    <p className="text-xs md:text-sm font-bold uppercase tracking-widest text-center">En attente d'une sortie</p>
                   </div>
                 )}
               </div>
@@ -274,14 +274,14 @@ const ArtistManager: React.FC<ArtistManagerProps> = ({ artist, gameState, onBack
 
         {/* Chat View */}
         {activeTab === 'chat' && (
-          <div className="h-full flex flex-col p-6 animate-in fade-in duration-300">
-             <div className="flex gap-2 mb-6 justify-center">
+          <div className="h-full flex flex-col p-3 md:p-6 animate-in fade-in duration-300">
+             <div className="flex gap-2 mb-4 md:mb-6 justify-center overflow-x-auto pb-2">
                 {['chat', 'renegotiate', 'collab'].map((c: any) => (
                   <button
                     key={c}
                     onClick={() => setChatContext(c)}
-                    className={`px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest border transition-all ${
-                      chatContext === c ? 'bg-violet-600 border-violet-500 text-white' : 'bg-white/5 border-white/10 text-slate-500'
+                    className={`px-3 md:px-4 py-2 rounded-full text-[9px] md:text-[10px] font-black uppercase tracking-widest border transition-all whitespace-nowrap touch-manipulation ${
+                      chatContext === c ? 'bg-violet-600 border-violet-500 text-white' : 'bg-white/5 border-white/10 text-slate-500 active:bg-white/10'
                     }`}
                   >
                     {c === 'chat' ? 'Discussion' : c === 'renegotiate' ? 'Contrat' : 'Collaboration'}
@@ -289,10 +289,10 @@ const ArtistManager: React.FC<ArtistManagerProps> = ({ artist, gameState, onBack
                 ))}
              </div>
              
-             <div ref={scrollRef} className="flex-1 overflow-y-auto space-y-6 px-10">
+             <div ref={scrollRef} className="flex-1 overflow-y-auto space-y-4 md:space-y-6 px-2 md:px-10">
                 {chatMessages.map((m, i) => (
                   <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                    <div className={`max-w-[70%] p-5 rounded-3xl ${
+                    <div className={`max-w-[85%] md:max-w-[70%] p-3 md:p-5 rounded-2xl md:rounded-3xl text-sm md:text-base ${
                       m.role === 'user' ? 'bg-violet-600 text-white rounded-tr-none' : 'bg-white/5 text-slate-200 rounded-tl-none border border-white/10'
                     }`}>
                       {m.text}

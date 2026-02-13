@@ -70,26 +70,26 @@ const EquipmentShop: React.FC<EquipmentShopProps> = ({ gameState, onPurchaseEqui
   const canAfford = (cost: number) => gameState.budget >= cost;
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="glass rounded-2xl max-w-4xl w-full max-h-[80vh] overflow-hidden">
-        <div className="p-6 border-b border-white/10">
-          <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-bold text-white flex items-center gap-3">
-              <Building2 className="w-8 h-8 text-green-400" />
-              Boutique d'Équipement
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-3 md:p-4">
+      <div className="glass rounded-xl md:rounded-2xl max-w-4xl w-full max-h-[90vh] md:max-h-[80vh] overflow-hidden">
+        <div className="p-4 md:p-6 border-b border-white/10">
+          <div className="flex items-center justify-between gap-4">
+            <h2 className="text-xl md:text-2xl font-bold text-white flex items-center gap-2 md:gap-3">
+              <Building2 className="w-6 h-6 md:w-8 md:h-8 text-green-400" />
+              <span className="truncate">Boutique d'Équipement</span>
             </h2>
             <button
               onClick={onClose}
-              className="text-white/60 hover:text-white transition-colors"
+              className="text-white/60 hover:text-white transition-colors p-2 rounded-lg hover:bg-white/10 touch-manipulation min-w-[44px] min-h-[44px] flex items-center justify-center"
             >
               ✕
             </button>
           </div>
-          <p className="text-white/60 mt-2">Améliorez vos installations pour booster vos artistes !</p>
+          <p className="text-white/60 mt-2 text-xs md:text-sm">Améliorez vos installations pour booster vos artistes !</p>
         </div>
 
-        <div className="p-6 overflow-y-auto max-h-[60vh]">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="p-4 md:p-6 overflow-y-auto max-h-[calc(90vh-120px)] md:max-h-[60vh]">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
             {availableEquipment.map((equipment) => (
               <div
                 key={equipment.id}

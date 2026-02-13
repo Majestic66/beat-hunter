@@ -557,42 +557,42 @@ const App: React.FC = () => {
       )}
 
       <main className="flex-1 relative flex flex-col h-full overflow-hidden">
-        <div className="h-16 px-8 border-b border-white/10 flex items-center justify-between glass z-10 shrink-0">
-          <div className="flex items-center gap-6">
+        <div className="min-h-16 px-3 md:px-8 py-3 border-b border-white/10 flex flex-wrap items-center justify-between glass z-10 shrink-0 gap-3">
+          <div className="flex items-center gap-2 md:gap-6 flex-1 min-w-0">
             {/* Mobile menu button */}
-            <button onClick={() => setShowSidebarMobile(true)} className="md:hidden p-2 bg-white/5 rounded-lg">
+            <button onClick={() => setShowSidebarMobile(true)} className="md:hidden p-3 bg-white/5 rounded-lg hover:bg-white/10 active:scale-95 transition-all touch-manipulation">
               <Menu className="w-5 h-5 text-white" />
             </button>
-            <div className="flex flex-col">
-              <span className="text-[10px] font-black text-violet-500 uppercase tracking-widest">{gameState.labelName}</span>
+            <div className="flex flex-col min-w-0">
+              <span className="text-[10px] md:text-xs font-black text-violet-500 uppercase tracking-widest truncate">{gameState.labelName}</span>
               <div className="flex items-center gap-2">
                  <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
-                 <span className="text-xs font-bold text-slate-300 uppercase">Connecté</span>
+                 <span className="text-[10px] md:text-xs font-bold text-slate-300 uppercase">Connecté</span>
               </div>
             </div>
             {selectedCountry && (
-                <div className="text-sm bg-white/5 px-4 py-1.5 rounded-full border border-white/5 uppercase font-bold text-[10px] text-slate-300">
+                <div className="hidden sm:block text-sm bg-white/5 px-3 md:px-4 py-1.5 rounded-full border border-white/5 uppercase font-bold text-[10px] text-slate-300">
                     <span className="text-slate-500 mr-2">Localisation :</span> {selectedCountry}
                 </div>
             )}
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 md:gap-4 flex-wrap">
              <div className="px-3 py-1 bg-violet-600 rounded-lg text-[10px] font-black uppercase">Jour {gameState.day}</div>
              <div className="text-[10px] font-bold text-emerald-400 bg-emerald-400/10 px-3 py-1 rounded-lg">Budget: {gameState.budget.toLocaleString()}€</div>
-             <div className="flex gap-2">
+             <div className="hidden sm:flex gap-2">
                <button
                  onClick={() => setShowEventManager(true)}
-                 className="p-2 bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors"
+                 className="p-2.5 md:p-2 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 rounded-lg transition-colors touch-manipulation min-w-[44px] min-h-[44px] md:min-w-0 md:min-h-0 flex items-center justify-center"
                  title="Événements & Achievements"
                >
-                 <Calendar className="w-4 h-4" />
+                 <Calendar className="w-5 h-5 md:w-4 md:h-4" />
                </button>
                <button
                  onClick={() => setShowEquipmentShop(true)}
-                 className="p-2 bg-green-600 hover:bg-green-700 rounded-lg transition-colors"
+                 className="p-2.5 md:p-2 bg-green-600 hover:bg-green-700 active:bg-green-800 rounded-lg transition-colors touch-manipulation min-w-[44px] min-h-[44px] md:min-w-0 md:min-h-0 flex items-center justify-center"
                  title="Boutique d'Équipement"
                >
-                 <ShoppingBag className="w-4 h-4" />
+                 <ShoppingBag className="w-5 h-5 md:w-4 md:h-4" />
                </button>
                {gameState.signedArtists.length > 0 && (
                  <button
@@ -600,10 +600,10 @@ const App: React.FC = () => {
                      setSelectedArtistForSkills(gameState.signedArtists[0]);
                      setShowSkillTree(true);
                    }}
-                   className="p-2 bg-yellow-600 hover:bg-yellow-700 rounded-lg transition-colors"
+                   className="p-2.5 md:p-2 bg-yellow-600 hover:bg-yellow-700 active:bg-yellow-800 rounded-lg transition-colors touch-manipulation min-w-[44px] min-h-[44px] md:min-w-0 md:min-h-0 flex items-center justify-center"
                    title="Arbre de Compétences"
                  >
-                   <Zap className="w-4 h-4" />
+                   <Zap className="w-5 h-5 md:w-4 md:h-4" />
                  </button>
                )}
                {/* Nouveaux boutons pour les systèmes avancés */}
@@ -613,10 +613,10 @@ const App: React.FC = () => {
                      setSelectedArtistForGame(gameState.signedArtists[0]);
                      setShowMiniGame(true);
                    }}
-                   className="p-2 bg-purple-600 hover:bg-purple-700 rounded-lg transition-colors"
+                   className="p-2.5 md:p-2 bg-purple-600 hover:bg-purple-700 active:bg-purple-800 rounded-lg transition-colors touch-manipulation min-w-[44px] min-h-[44px] md:min-w-0 md:min-h-0 flex items-center justify-center"
                    title="Mini-Jeux"
                  >
-                   <Gamepad2 className="w-4 h-4" />
+                   <Gamepad2 className="w-5 h-5 md:w-4 md:h-4" />
                  </button>
                )}
                <button
@@ -680,20 +680,20 @@ const App: React.FC = () => {
                <WorldMap onCountryClick={handleCountryClick} selectedCountry={selectedCountry} />
             </div>
           ) : (
-            <div className="p-10 h-full overflow-y-auto">
-              <div className="max-w-6xl mx-auto space-y-10">
-                <div className="flex justify-between items-end">
-                  <h2 className="text-5xl font-black tracking-tighter text-white italic uppercase">Talents détectés</h2>
-                  <button onClick={() => {setScoutingResults([]); setSelectedCountry(null);}} className="px-8 py-3 bg-white/5 border border-white/10 rounded-full text-[10px] font-black uppercase text-slate-300">Quitter le scanner</button>
+            <div className="p-4 md:p-10 h-full overflow-y-auto">
+              <div className="max-w-6xl mx-auto space-y-6 md:space-y-10">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
+                  <h2 className="text-3xl md:text-5xl font-black tracking-tighter text-white italic uppercase">Talents détectés</h2>
+                  <button onClick={() => {setScoutingResults([]); setSelectedCountry(null);}} className="px-6 md:px-8 py-3 bg-white/5 border border-white/10 rounded-full text-[10px] font-black uppercase text-slate-300 hover:bg-white/10 active:scale-95 transition-all touch-manipulation">Quitter le scanner</button>
                 </div>
 
                 {isScouting ? (
                   <div className="h-[50vh] flex flex-col items-center justify-center gap-8">
-                    <Loader2 className="w-16 h-16 text-violet-500 animate-spin" />
-                    <p className="text-xl font-black uppercase tracking-[0.3em] animate-pulse">Scan des fréquences...</p>
+                    <Loader2 className="w-12 md:w-16 h-12 md:h-16 text-violet-500 animate-spin" />
+                    <p className="text-lg md:text-xl font-black uppercase tracking-[0.2em] md:tracking-[0.3em] animate-pulse text-center">Scan des fréquences...</p>
                   </div>
                 ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 pb-20">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8 pb-12 md:pb-20">
                     {scoutingResults.map(talent => (
                       <TalentCard key={talent.id} talent={talent as Talent} onNegotiate={(t) => setActiveNegotiation(t)} />
                     ))}
@@ -730,20 +730,20 @@ const App: React.FC = () => {
         )}
 
         {showSkillTree && selectedArtistForSkills && (
-          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-            <div className="glass rounded-2xl max-w-4xl w-full max-h-[80vh] overflow-hidden">
-              <div className="p-6 border-b border-white/10">
-                <div className="flex items-center justify-between">
-                  <h2 className="text-2xl font-bold text-white flex items-center gap-3">
-                    <Zap className="w-8 h-8 text-yellow-400" />
-                    Développement de {selectedArtistForSkills.name}
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-3 md:p-4">
+            <div className="glass rounded-xl md:rounded-2xl max-w-4xl w-full max-h-[90vh] md:max-h-[80vh] overflow-hidden">
+              <div className="p-4 md:p-6 border-b border-white/10">
+                <div className="flex items-center justify-between gap-3">
+                  <h2 className="text-lg md:text-2xl font-bold text-white flex items-center gap-2 md:gap-3 min-w-0">
+                    <Zap className="w-6 h-6 md:w-8 md:h-8 text-yellow-400 flex-shrink-0" />
+                    <span className="truncate">Développement de {selectedArtistForSkills.name}</span>
                   </h2>
                   <button
                     onClick={() => {
                       setShowSkillTree(false);
                       setSelectedArtistForSkills(null);
                     }}
-                    className="text-white/60 hover:text-white transition-colors"
+                    className="text-white/60 hover:text-white active:text-white transition-colors p-2 rounded-lg hover:bg-white/10 touch-manipulation min-w-[44px] min-h-[44px] flex items-center justify-center flex-shrink-0"
                   >
                     ✕
                   </button>
@@ -767,23 +767,23 @@ const App: React.FC = () => {
         )}
 
         {showRivalrySystem && (
-          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-            <div className="glass rounded-2xl max-w-6xl w-full max-h-[80vh] overflow-hidden">
-              <div className="p-6 border-b border-white/10">
-                <div className="flex items-center justify-between">
-                  <h2 className="text-2xl font-bold text-white flex items-center gap-3">
-                    <Crown className="w-8 h-8 text-yellow-400" />
-                    Système de Rivalité
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-3 md:p-4">
+            <div className="glass rounded-xl md:rounded-2xl max-w-6xl w-full max-h-[90vh] md:max-h-[80vh] overflow-hidden">
+              <div className="p-4 md:p-6 border-b border-white/10">
+                <div className="flex items-center justify-between gap-3">
+                  <h2 className="text-lg md:text-2xl font-bold text-white flex items-center gap-2 md:gap-3">
+                    <Crown className="w-6 h-6 md:w-8 md:h-8 text-yellow-400" />
+                    <span className="truncate">Système de Rivalité</span>
                   </h2>
                   <button
                     onClick={() => setShowRivalrySystem(false)}
-                    className="text-white/60 hover:text-white transition-colors"
+                    className="text-white/60 hover:text-white active:text-white transition-colors p-2 rounded-lg hover:bg-white/10 touch-manipulation min-w-[44px] min-h-[44px] flex items-center justify-center"
                   >
                     ✕
                   </button>
                 </div>
               </div>
-              <div className="p-6 max-h-[60vh] overflow-y-auto">
+              <div className="p-4 md:p-6 max-h-[calc(90vh-100px)] md:max-h-[60vh] overflow-y-auto">
                 <RivalrySystem
                   gameState={gameState}
                   onRivalryAction={handleRivalryAction}
@@ -794,23 +794,23 @@ const App: React.FC = () => {
         )}
 
         {showQuestSystem && (
-          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-            <div className="glass rounded-2xl max-w-6xl w-full max-h-[80vh] overflow-hidden">
-              <div className="p-6 border-b border-white/10">
-                <div className="flex items-center justify-between">
-                  <h2 className="text-2xl font-bold text-white flex items-center gap-3">
-                    <Scroll className="w-8 h-8 text-purple-400" />
-                    Système de Quêtes
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-3 md:p-4">
+            <div className="glass rounded-xl md:rounded-2xl max-w-6xl w-full max-h-[90vh] md:max-h-[80vh] overflow-hidden">
+              <div className="p-4 md:p-6 border-b border-white/10">
+                <div className="flex items-center justify-between gap-3">
+                  <h2 className="text-lg md:text-2xl font-bold text-white flex items-center gap-2 md:gap-3">
+                    <Scroll className="w-6 h-6 md:w-8 md:h-8 text-purple-400" />
+                    <span className="truncate">Système de Quêtes</span>
                   </h2>
                   <button
                     onClick={() => setShowQuestSystem(false)}
-                    className="text-white/60 hover:text-white transition-colors"
+                    className="text-white/60 hover:text-white active:text-white transition-colors p-2 rounded-lg hover:bg-white/10 touch-manipulation min-w-[44px] min-h-[44px] flex items-center justify-center"
                   >
                     ✕
                   </button>
                 </div>
               </div>
-              <div className="p-6 max-h-[60vh] overflow-y-auto">
+              <div className="p-4 md:p-6 max-h-[calc(90vh-100px)] md:max-h-[60vh] overflow-y-auto">
                 <QuestSystem
                   gameState={gameState}
                   onQuestAccept={handleQuestAccept}
@@ -822,23 +822,23 @@ const App: React.FC = () => {
         )}
 
         {showWeatherSystem && (
-          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-            <div className="glass rounded-2xl max-w-6xl w-full max-h-[80vh] overflow-hidden">
-              <div className="p-6 border-b border-white/10">
-                <div className="flex items-center justify-between">
-                  <h2 className="text-2xl font-bold text-white flex items-center gap-3">
-                    <Cloud className="w-8 h-8 text-cyan-400" />
-                    Système Météo
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-3 md:p-4">
+            <div className="glass rounded-xl md:rounded-2xl max-w-6xl w-full max-h-[90vh] md:max-h-[80vh] overflow-hidden">
+              <div className="p-4 md:p-6 border-b border-white/10">
+                <div className="flex items-center justify-between gap-3">
+                  <h2 className="text-lg md:text-2xl font-bold text-white flex items-center gap-2 md:gap-3">
+                    <Cloud className="w-6 h-6 md:w-8 md:h-8 text-cyan-400" />
+                    <span className="truncate">Système Météo</span>
                   </h2>
                   <button
                     onClick={() => setShowWeatherSystem(false)}
-                    className="text-white/60 hover:text-white transition-colors"
+                    className="text-white/60 hover:text-white active:text-white transition-colors p-2 rounded-lg hover:bg-white/10 touch-manipulation min-w-[44px] min-h-[44px] flex items-center justify-center"
                   >
                     ✕
                   </button>
                 </div>
               </div>
-              <div className="p-6 max-h-[60vh] overflow-y-auto">
+              <div className="p-4 md:p-6 max-h-[calc(90vh-100px)] md:max-h-[60vh] overflow-y-auto">
                 <WeatherSystem
                   gameState={gameState}
                   onWeatherChange={handleWeatherChange}
@@ -849,23 +849,23 @@ const App: React.FC = () => {
         )}
 
         {showSaveLoadSystem && (
-          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-            <div className="glass rounded-2xl max-w-6xl w-full max-h-[80vh] overflow-hidden">
-              <div className="p-6 border-b border-white/10">
-                <div className="flex items-center justify-between">
-                  <h2 className="text-2xl font-bold text-white flex items-center gap-3">
-                    <Save className="w-8 h-8 text-blue-400" />
-                    Sauvegarde & Chargement
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-3 md:p-4">
+            <div className="glass rounded-xl md:rounded-2xl max-w-6xl w-full max-h-[90vh] md:max-h-[80vh] overflow-hidden">
+              <div className="p-4 md:p-6 border-b border-white/10">
+                <div className="flex items-center justify-between gap-3">
+                  <h2 className="text-lg md:text-2xl font-bold text-white flex items-center gap-2 md:gap-3">
+                    <Save className="w-6 h-6 md:w-8 md:h-8 text-blue-400" />
+                    <span className="truncate">Sauvegarde & Chargement</span>
                   </h2>
                   <button
                     onClick={() => setShowSaveLoadSystem(false)}
-                    className="text-white/60 hover:text-white transition-colors"
+                    className="text-white/60 hover:text-white active:text-white transition-colors p-2 rounded-lg hover:bg-white/10 touch-manipulation min-w-[44px] min-h-[44px] flex items-center justify-center"
                   >
                     ✕
                   </button>
                 </div>
               </div>
-              <div className="p-6 max-h-[60vh] overflow-y-auto">
+              <div className="p-4 md:p-6 max-h-[calc(90vh-100px)] md:max-h-[60vh] overflow-y-auto">
                 <SaveLoadSystem
                   gameState={gameState}
                   onLoadGame={handleLoadGame}
@@ -876,23 +876,23 @@ const App: React.FC = () => {
         )}
 
         {showStatisticsSystem && (
-          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-            <div className="glass rounded-2xl max-w-6xl w-full max-h-[80vh] overflow-hidden">
-              <div className="p-6 border-b border-white/10">
-                <div className="flex items-center justify-between">
-                  <h2 className="text-2xl font-bold text-white flex items-center gap-3">
-                    <BarChart3 className="w-8 h-8 text-green-400" />
-                    Statistiques Détaillées
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-3 md:p-4">
+            <div className="glass rounded-xl md:rounded-2xl max-w-6xl w-full max-h-[90vh] md:max-h-[80vh] overflow-hidden">
+              <div className="p-4 md:p-6 border-b border-white/10">
+                <div className="flex items-center justify-between gap-3">
+                  <h2 className="text-lg md:text-2xl font-bold text-white flex items-center gap-2 md:gap-3">
+                    <BarChart3 className="w-6 h-6 md:w-8 md:h-8 text-green-400" />
+                    <span className="truncate">Statistiques Détaillées</span>
                   </h2>
                   <button
                     onClick={() => setShowStatisticsSystem(false)}
-                    className="text-white/60 hover:text-white transition-colors"
+                    className="text-white/60 hover:text-white active:text-white transition-colors p-2 rounded-lg hover:bg-white/10 touch-manipulation min-w-[44px] min-h-[44px] flex items-center justify-center"
                   >
                     ✕
                   </button>
                 </div>
               </div>
-              <div className="p-6 max-h-[60vh] overflow-y-auto">
+              <div className="p-4 md:p-6 max-h-[calc(90vh-100px)] md:max-h-[60vh] overflow-y-auto">
                 <StatisticsSystem gameState={gameState} />
               </div>
             </div>
@@ -900,23 +900,23 @@ const App: React.FC = () => {
         )}
 
         {showCareerMode && (
-          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-            <div className="glass rounded-2xl max-w-6xl w-full max-h-[80vh] overflow-hidden">
-              <div className="p-6 border-b border-white/10">
-                <div className="flex items-center justify-between">
-                  <h2 className="text-2xl font-bold text-white flex items-center gap-3">
-                    <Trophy className="w-8 h-8 text-yellow-400" />
-                    Mode Carrière
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-3 md:p-4">
+            <div className="glass rounded-xl md:rounded-2xl max-w-6xl w-full max-h-[90vh] md:max-h-[80vh] overflow-hidden">
+              <div className="p-4 md:p-6 border-b border-white/10">
+                <div className="flex items-center justify-between gap-3">
+                  <h2 className="text-lg md:text-2xl font-bold text-white flex items-center gap-2 md:gap-3">
+                    <Trophy className="w-6 h-6 md:w-8 md:h-8 text-yellow-400" />
+                    <span className="truncate">Mode Carrière</span>
                   </h2>
                   <button
                     onClick={() => setShowCareerMode(false)}
-                    className="text-white/60 hover:text-white transition-colors"
+                    className="text-white/60 hover:text-white active:text-white transition-colors p-2 rounded-lg hover:bg-white/10 touch-manipulation min-w-[44px] min-h-[44px] flex items-center justify-center"
                   >
                     ✕
                   </button>
                 </div>
               </div>
-              <div className="p-6 max-h-[60vh] overflow-y-auto">
+              <div className="p-4 md:p-6 max-h-[calc(90vh-100px)] md:max-h-[60vh] overflow-y-auto">
                 <CareerMode
                   gameState={gameState}
                   onMilestoneComplete={handleMilestoneComplete}
