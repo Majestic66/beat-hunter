@@ -16,6 +16,7 @@ import WeatherSystem from './components/WeatherSystem';
 import SaveLoadSystem from './components/SaveLoadSystem';
 import StatisticsSystem from './components/StatisticsSystem';
 import CareerMode from './components/CareerMode';
+import TourPlanner from './components/TourPlanner';
 import { GameState, Talent, Release, GameEvent, Equipment, Achievement, Skill, SkillType, RivalLabel, Quest, WeatherEffect, CareerMilestone, MiniGameResult, Contract } from './types';
 import { generateTalentsForCountry, generateGlobalNews, generateRandomEvent, generateCollaboration, generateSpecialization, generateExtendedChatResponse, updateAllSACEMRevenues, ageArtists, calculateSACEMRevenue } from './services/geminiService';
 import { INITIAL_BUDGET, INITIAL_REPUTATION, ACHIEVEMENTS, MARKET_TRENDS } from './constants';
@@ -139,6 +140,7 @@ const App: React.FC = () => {
   const [showSaveLoadSystem, setShowSaveLoadSystem] = useState(false);
   const [showStatisticsSystem, setShowStatisticsSystem] = useState(false);
   const [showCareerMode, setShowCareerMode] = useState(false);
+  const [showTourPlanner, setShowTourPlanner] = useState(false);
 
   const handleUpdateState = (update: any) => {
     setGameState(prev => {
@@ -764,6 +766,41 @@ const App: React.FC = () => {
           />
         )}
 
+        {showTourPlanner && (
+          <TourPlanner
+            gameState={gameState}
+            onClose={() => setShowTourPlanner(false)}
+            onCreateTour={(tour) => {
+              // create tour: deduct cost, add to tours, add an event
+              setGameState(prev => {
+                if (prev.budget < tour.cost) {
+                  return { ...prev, notifications: [...prev.notifications, 'Budget insuffisant pour lancer la tournée'].slice(-5) };
+                }
+                const newState = { ...prev } as GameState;
+                newState.budget = newState.budget - tour.cost;
+                newState.tours = [...(newState.tours || []), tour];
+                // create a simple event for the tour
+                const event = {
+                  id: `evt-${tour.id}`,
+                  type: 'Tour' as any,
+                  title: `Tournée: ${tour.destinations.join(', ')}`,
+                  description: `Tournée de ${tour.destinations.length} villes`,
+                  date: tour.startDate,
+                  location: tour.destinations[0],
+                  participants: [tour.artistId],
+                  rewards: { budget: tour.revenueEstimate, reputation: 8, experience: 100 },
+                  requirements: {}
+                } as any;
+                newState.activeEvents = [...newState.activeEvents, event];
+                newState.notifications = [...newState.notifications, `Tournée planifiée: ${tour.destinations.length} villes`].slice(-5);
+                // reduce artist energy
+                newState.signedArtists = newState.signedArtists.map(a => a.id === tour.artistId ? { ...a, energy: Math.max(0, (a.energy || 100) - tour.destinations.length * 10) } : a);
+                return newState;
+              });
+            }}
+          />
+        )}
+
         {showEventManager && (
           <EventManager
             gameState={gameState}
@@ -771,6 +808,9 @@ const App: React.FC = () => {
             onClose={() => setShowEventManager(false)}
           />
         )}
+
+        {/* Floating tour planner button */}
+        <button onClick={() => setShowTourPlanner(true)} className="fixed bottom-6 right-6 z-40 bg-emerald-600 p-3 rounded-full shadow-lg text-white">📅</button>
 
         {showEquipmentShop && (
           <EquipmentShop

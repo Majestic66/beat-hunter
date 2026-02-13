@@ -213,6 +213,7 @@ export interface GameState {
     destinations: string[];
     progress: number;
   };
+  tours?: Tour[];
   // Nouveaux systèmes
   talents: Talent[]; // Liste complète des talents
   rivalLabels: RivalLabel[];
