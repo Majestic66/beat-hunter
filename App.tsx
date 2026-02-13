@@ -234,12 +234,19 @@ const App: React.FC = () => {
       const talents = await generateTalentsForCountry(countryName);
       // Remove duplicates: artists already signed or repeated in the result
       const existingIds = new Set(gameState.signedArtists.map(a => a.id));
-      const seen = new Set<string>();
+      const existingNames = new Set(gameState.signedArtists.map(a => (a.name || '').toLowerCase().trim()));
+      const seenIds = new Set<string>();
+      const seenNames = new Set<string>();
       const unique = talents.filter(t => {
         if (!t.id) return false;
-        if (existingIds.has(t.id)) return false; // already signed
-        if (seen.has(t.id)) return false; // duplicate in this batch
-        seen.add(t.id);
+        const nameKey = (t.name || '').toLowerCase().trim();
+        // skip if already signed by id or name
+        if (existingIds.has(t.id)) return false;
+        if (existingNames.has(nameKey)) return false;
+        // skip duplicates inside the generated batch by id or by name
+        if (seenIds.has(t.id) || (nameKey && seenNames.has(nameKey))) return false;
+        seenIds.add(t.id);
+        if (nameKey) seenNames.add(nameKey);
         return true;
       });
       setScoutingResults(unique);
