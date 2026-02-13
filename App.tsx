@@ -162,6 +162,9 @@ const App: React.FC = () => {
                   recoupedFromThisRelease = amountToRecoup;
                   // update contract's recoupedAmount
                   contract.recoupedAmount = (contract.recoupedAmount || 0) + amountToRecoup;
+                  // record recoup history
+                  contract.recoupHistory = contract.recoupHistory || [];
+                  contract.recoupHistory.unshift({ releaseId: release.id, amount: amountToRecoup, date: Date.now() });
                 }
               }
 

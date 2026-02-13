@@ -174,6 +174,7 @@ export interface Contract {
   optionPeriods?: number; // number of optional extension periods (0..3)
   buyout?: number; // optional buyout amount to terminate/transfer contract
   recoupedAmount?: number; // amount already recouped towards the advance
+  recoupHistory?: { releaseId?: string; amount: number; date: number }[]; // history of recouped amounts per release
 }
 
 export interface Player {

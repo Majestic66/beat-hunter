@@ -49,7 +49,24 @@ const ArtistStats: React.FC<ArtistStatsProps> = ({ artist, gameState, onUpdateSt
     const baseIncome = fans * 0.001; // 0.1% des fans en revenus mensuels
     const streamBonus = artist.releaseHistory.reduce((sum, r) => sum + (r.streams || 0), 0) * 0.0001;
     const popularityMultiplier = Math.max(0.5, (artist.popularity || 0) / 50);
-    return Math.floor((baseIncome + streamBonus) * popularityMultiplier);
+    // Estimate gross monthly revenue
+    const gross = (baseIncome + streamBonus) * popularityMultiplier;
+
+    // If artist has a contract with recoup not complete, royalties may be withheld until recoup
+    const contract = artist.currentContract;
+    if (contract) {
+      const royaltyPct = (contract.royalty || 0) / 100;
+      const recouped = contract.recoupedAmount || 0;
+      const advance = contract.advance || 0;
+      // Simple rule: if recoup not complete, artist receives no royalties yet
+      if (advance > 0 && recouped < advance) {
+        return Math.floor(0);
+      }
+      // otherwise artist gets royalty% of gross
+      return Math.floor(gross * royaltyPct);
+    }
+
+    return Math.floor(gross);
   }
 
   function calculatePopularityTrend(artist: Talent): 'up' | 'down' | 'stable' {
@@ -386,6 +403,20 @@ const ArtistStats: React.FC<ArtistStatsProps> = ({ artist, gameState, onUpdateSt
                       <div className="text-blue-400 font-bold">{(release.sacemRevenue || 0).toLocaleString()}€</div>
                     </div>
                   </div>
+                  {/* Show recoup applied for this release if any */}
+                  {artist.currentContract?.recoupHistory && (
+                    (() => {
+                      const entry = artist.currentContract!.recoupHistory!.find(e => e.releaseId === release.id);
+                      if (entry && entry.amount > 0) {
+                        return (
+                          <div className="mt-3 text-sm text-white/70">
+                            <strong>Recouvré sur cette release:</strong> {entry.amount.toLocaleString()}€
+                          </div>
+                        );
+                      }
+                      return null;
+                    })()
+                  )}
                 </div>
               ))}
             </div>
