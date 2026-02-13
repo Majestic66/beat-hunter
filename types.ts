@@ -168,6 +168,12 @@ export interface Contract {
   royalty: number;
   duration: number;
   status: 'active' | 'expired' | 'terminated';
+  // New fields for extended contract model
+  recoupmentRate?: number; // fraction 0-1 used to recoup advance from artist revenue
+  exclusivity?: boolean; // true = exclusive contract
+  optionPeriods?: number; // number of optional extension periods (0..3)
+  buyout?: number; // optional buyout amount to terminate/transfer contract
+  recoupedAmount?: number; // amount already recouped towards the advance
 }
 
 export interface Player {

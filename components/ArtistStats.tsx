@@ -202,6 +202,55 @@ const ArtistStats: React.FC<ArtistStatsProps> = ({ artist, gameState, onUpdateSt
             </div>
           </div>
 
+          {/* Contrat */}
+          {artist.currentContract && (
+            <div className="glass rounded-lg p-4 border border-white/10 mt-4">
+              <h3 className="font-bold text-white mb-3 flex items-center gap-2">
+                <Clock className="w-5 h-5" /> Contrat
+              </h3>
+              <div className="grid grid-cols-2 gap-2 text-sm">
+                <div>
+                  <span className="text-white/60">Avance</span>
+                  <div className="text-white font-bold">{(artist.currentContract.advance || 0).toLocaleString()}€</div>
+                </div>
+                <div>
+                  <span className="text-white/60">Royalties</span>
+                  <div className="text-white font-bold">{(artist.currentContract.royalty || 0)}%</div>
+                </div>
+                <div>
+                  <span className="text-white/60">Durée</span>
+                  <div className="text-white font-bold">{(artist.currentContract.duration || 0)} mois</div>
+                </div>
+                <div>
+                  <span className="text-white/60">Exclusivité</span>
+                  <div className="text-white font-bold">{artist.currentContract.exclusivity ? 'Oui' : 'Non'}</div>
+                </div>
+                <div>
+                  <span className="text-white/60">Recouvrement</span>
+                  <div className="text-white font-bold">{Math.round((artist.currentContract.recoupmentRate ?? 1) * 100)}%</div>
+                </div>
+                <div>
+                  <span className="text-white/60">Périodes optionnelles</span>
+                  <div className="text-white font-bold">{artist.currentContract.optionPeriods || 0}</div>
+                </div>
+              </div>
+              {/* Recouvrement progress */}
+              <div className="mt-4">
+                <span className="text-white/60 text-sm">Recouvrement</span>
+                <div className="w-full bg-gray-700 rounded-full h-3 mt-2">
+                  <div
+                    className="bg-amber-400 h-3 rounded-full"
+                    style={{ width: `${Math.min(100, Math.round(((artist.currentContract.recoupedAmount || 0) / (artist.currentContract.advance || 1)) * 100))}%` }}
+                  />
+                </div>
+                <div className="flex justify-between text-xs text-white/60 mt-1">
+                  <span>{(artist.currentContract.recoupedAmount || 0).toLocaleString()}€ recouvrés</span>
+                  <span>{(artist.currentContract.advance || 0).toLocaleString()}€ avance</span>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Statistiques détaillées */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="glass rounded-lg p-4 border border-white/10">

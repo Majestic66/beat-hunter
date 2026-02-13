@@ -16,7 +16,7 @@ import WeatherSystem from './components/WeatherSystem';
 import SaveLoadSystem from './components/SaveLoadSystem';
 import StatisticsSystem from './components/StatisticsSystem';
 import CareerMode from './components/CareerMode';
-import { GameState, Talent, Release, GameEvent, Equipment, Achievement, Skill, SkillType, RivalLabel, Quest, WeatherEffect, CareerMilestone, MiniGameResult } from './types';
+import { GameState, Talent, Release, GameEvent, Equipment, Achievement, Skill, SkillType, RivalLabel, Quest, WeatherEffect, CareerMilestone, MiniGameResult, Contract } from './types';
 import { generateTalentsForCountry, generateGlobalNews, generateRandomEvent, generateCollaboration, generateSpecialization, generateExtendedChatResponse, updateAllSACEMRevenues, ageArtists, calculateSACEMRevenue } from './services/geminiService';
 import { INITIAL_BUDGET, INITIAL_REPUTATION, ACHIEVEMENTS, MARKET_TRENDS } from './constants';
 import { Loader2, Music, Building2, Calendar, ShoppingBag, Zap, Gamepad2, Crown, Scroll, Cloud, Save, BarChart3, Trophy, Menu, X } from 'lucide-react';
@@ -146,22 +146,49 @@ const App: React.FC = () => {
       switch(update.type) {
         case 'NEW_RELEASE': {
           const { artistId, release } = update;
-          newState.budget += release.revenue;
+          // Apply recoupment logic: label receives release revenue but a portion may be used to recoup the artist advance
           newState.reputation += release.reputationGain || 5;
           newState.signedArtists = newState.signedArtists.map(a => {
             if (a.id === artistId) {
-              return {
+              const contract = a.currentContract;
+              let recoupedFromThisRelease = 0;
+              if (contract && (contract.advance || 0) > 0) {
+                const recoupmentRate = contract.recoupmentRate ?? 1;
+                const already = contract.recoupedAmount ?? 0;
+                const remaining = Math.max(0, (contract.advance || 0) - already);
+                if (remaining > 0) {
+                  const recoupable = (release.revenue || 0) * (recoupmentRate);
+                  const amountToRecoup = Math.min(recoupable, remaining);
+                  recoupedFromThisRelease = amountToRecoup;
+                  // update contract's recoupedAmount
+                  contract.recoupedAmount = (contract.recoupedAmount || 0) + amountToRecoup;
+                }
+              }
+
+              // Budget increases by revenue minus the amount taken to recoup the advance
+              newState.budget += (release.revenue || 0) - recoupedFromThisRelease;
+
+              const updatedArtist = {
                 ...a,
-                totalRevenue: (a.totalRevenue || 0) + release.revenue,
+                totalRevenue: (a.totalRevenue || 0) + (release.revenue || 0),
                 popularity: Math.min(100, (a.popularity || 0) + (release.buzz / 12)),
                 releaseHistory: [release, ...a.releaseHistory],
                 relationship: Math.min(100, a.relationship + (release.buzz > 40 ? 4 : -6)),
                 experience: a.experience + 50,
                 mood: Math.min(100, a.mood + 10),
-                energy: Math.max(0, a.energy - 20)
+                energy: Math.max(0, a.energy - 20),
+                currentContract: contract
               };
+
+              // If recoup complete, notify
+              if (contract && (contract.recoupedAmount || 0) >= (contract.advance || 0) && (contract.advance || 0) > 0) {
+                newState.notifications = [...newState.notifications, `${updatedArtist.name} : avance entièrement recouvrée`].slice(-5);
+              }
+
+              return updatedArtist;
             }
             if (release.collaborators?.includes(a.id)) {
+              // collaborators get a share, no recoup against their contracts here
               return {
                 ...a,
                 totalRevenue: (a.totalRevenue || 0) + (release.revenue * 0.2),
@@ -208,7 +235,7 @@ const App: React.FC = () => {
     }
   };
 
-  const finalizeContract = (advance: number, royalty: number) => {
+  const finalizeContract = (contract: Contract) => {
     if (!activeNegotiation) return;
     const newArtist: Talent = {
       ...activeNegotiation as Talent,
@@ -228,11 +255,22 @@ const App: React.FC = () => {
       collaborations: [],
       relationship: 60,
       releaseHistory: [],
-      currentContract: { artistId: activeNegotiation.id!, advance, royalty, duration: 24, status: 'active' }
+      currentContract: {
+        artistId: contract.artistId,
+        advance: contract.advance,
+        royalty: contract.royalty,
+        duration: contract.duration ?? 24,
+        status: contract.status || 'active',
+        recoupmentRate: contract.recoupmentRate ?? 1,
+        exclusivity: contract.exclusivity ?? true,
+        optionPeriods: contract.optionPeriods ?? 0,
+        buyout: contract.buyout ?? 0,
+        recoupedAmount: 0
+      }
     };
     setGameState(prev => ({
       ...prev,
-      budget: prev.budget - advance,
+      budget: prev.budget - contract.advance,
       reputation: prev.reputation + 5,
       signedArtists: [...prev.signedArtists, newArtist],
       notifications: [...prev.notifications, `${newArtist.name} a signé !`].slice(-5)

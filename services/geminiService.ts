@@ -241,7 +241,8 @@ export async function getNegotiationResponse(
   talent: Talent,
   offerAdvance: number,
   offerRoyalty: number,
-  chatHistory: { role: 'user' | 'model', text: string }[]
+  chatHistory: { role: 'user' | 'model', text: string }[],
+  options?: { duration?: number; exclusivity?: boolean; recoupmentRate?: number; optionPeriods?: number }
 ): Promise<{ reply: string, accepted: boolean }> {
   // Simulation de négociation avec réponses variées
   await new Promise(resolve => setTimeout(resolve, 600 + Math.random() * 400));
@@ -339,15 +340,34 @@ export async function getNegotiationResponse(
   let accepted = false;
   let reply = "";
 
-  if (averageRatio >= 0.9) {
+  // Adjust acceptance probability based on contract terms (if provided)
+  const duration = options?.duration ?? 24;
+  const exclusivity = options?.exclusivity ?? true;
+  const recoupment = options?.recoupmentRate ?? 1; // 0..1
+  const optionPeriods = options?.optionPeriods ?? 0;
+
+  // Terms make the offer less attractive to the artist when more restrictive / harsh
+  let termPenalty = 0;
+  if (exclusivity) termPenalty -= 0.08;
+  termPenalty -= recoupment * 0.15; // higher recoupment reduces attractiveness
+  if (duration > 24) termPenalty -= ((duration - 24) / 24) * 0.04;
+  termPenalty -= optionPeriods * 0.03;
+
+  const effectiveScore = averageRatio + termPenalty;
+
+  if (effectiveScore >= 0.9) {
     accepted = true;
     reply = personalityResponses.accept[Math.floor(Math.random() * personalityResponses.accept.length)];
-  } else if (averageRatio >= 0.7) {
-    accepted = Math.random() > 0.4; // 60% chance d'accepter
+  } else if (effectiveScore >= 0.7) {
+    // partially acceptable: chance influenced by generosity
+    accepted = Math.random() > 0.45 - (averageRatio - 0.7) * 0.5;
     if (accepted) {
       reply = personalityResponses.accept[Math.floor(Math.random() * personalityResponses.accept.length)];
     } else {
-      reply = personalityResponses.reject[Math.floor(Math.random() * personalityResponses.reject.length)];
+      // artist may comment on contract terms
+      const termComment = recoupment > 0.5 ? "Le recouvrement est élevé, ça m'inquiète." : (exclusivity ? "L'exclusivité me bride un peu." : ""
+      );
+      reply = (personalityResponses.reject[Math.floor(Math.random() * personalityResponses.reject.length)] ) + (termComment ? ` ${termComment}` : '');
     }
   } else {
     accepted = false;

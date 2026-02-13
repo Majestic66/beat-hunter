@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Talent, GameState } from '../types';
+import { Talent, GameState, Contract } from '../types';
 import { getNegotiationResponse } from '../services/geminiService';
 import { X, Send, DollarSign, Percent, CheckCircle, AlertCircle } from 'lucide-react';
 
@@ -8,7 +8,7 @@ interface NegotiationModalProps {
   talent: Talent;
   gameState: GameState;
   onClose: () => void;
-  onSuccess: (advance: number, royalty: number) => void;
+  onSuccess: (contract: Contract) => void;
 }
 
 const NegotiationModal: React.FC<NegotiationModalProps> = ({ talent, gameState, onClose, onSuccess }) => {
@@ -18,6 +18,10 @@ const NegotiationModal: React.FC<NegotiationModalProps> = ({ talent, gameState, 
   const [userInput, setUserInput] = useState("");
   const [offerAdvance, setOfferAdvance] = useState(talent.requestedAdvance);
   const [offerRoyalty, setOfferRoyalty] = useState(talent.requestedRoyalty);
+  const [offerDuration, setOfferDuration] = useState(24);
+  const [offerExclusivity, setOfferExclusivity] = useState(true);
+  const [offerRecoupment, setOfferRecoupment] = useState(100); // percent
+  const [offerOptionPeriods, setOfferOptionPeriods] = useState(0);
   const [isTyping, setIsTyping] = useState(false);
   const [dealStatus, setDealStatus] = useState<'negotiating' | 'accepted' | 'rejected'>('negotiating');
   
@@ -50,7 +54,12 @@ const NegotiationModal: React.FC<NegotiationModalProps> = ({ talent, gameState, 
     setIsTyping(true);
 
     try {
-      const response = await getNegotiationResponse(talent, offerAdvance, offerRoyalty, newMessages);
+      const response = await getNegotiationResponse(talent, offerAdvance, offerRoyalty, newMessages, {
+        duration: offerDuration,
+        exclusivity: offerExclusivity,
+        recoupmentRate: offerRecoupment / 100,
+        optionPeriods: offerOptionPeriods
+      });
       
       setMessages(prev => [...prev, { role: 'model' as const, text: response.reply }]);
       
@@ -74,7 +83,12 @@ const NegotiationModal: React.FC<NegotiationModalProps> = ({ talent, gameState, 
     setIsTyping(true);
 
     try {
-      const response = await getNegotiationResponse(talent, offerAdvance, offerRoyalty, newMessages);
+      const response = await getNegotiationResponse(talent, offerAdvance, offerRoyalty, newMessages, {
+        duration: offerDuration,
+        exclusivity: offerExclusivity,
+        recoupmentRate: offerRecoupment / 100,
+        optionPeriods: offerOptionPeriods
+      });
       
       setMessages(prev => [...prev, { role: 'model' as const, text: response.reply }]);
       
@@ -90,7 +104,20 @@ const NegotiationModal: React.FC<NegotiationModalProps> = ({ talent, gameState, 
   };
 
   const handleSignContract = () => {
-    onSuccess(offerAdvance, offerRoyalty);
+    if (!talent.id) return;
+    const contract: Contract = {
+      artistId: talent.id,
+      advance: offerAdvance,
+      royalty: offerRoyalty,
+      duration: offerDuration,
+      status: 'active',
+      recoupmentRate: Math.max(0, Math.min(1, offerRecoupment / 100)),
+      exclusivity: !!offerExclusivity,
+      optionPeriods: offerOptionPeriods,
+      buyout: 0
+    };
+
+    onSuccess(contract);
   };
 
   return (
@@ -225,6 +252,86 @@ const NegotiationModal: React.FC<NegotiationModalProps> = ({ talent, gameState, 
               <div className="flex justify-between text-[9px] text-slate-500 font-bold">
                 <span>0%</span>
                 <span>50%</span>
+              </div>
+            </div>
+
+            {/* Duration */}
+            <div className="space-y-3 p-4 bg-white/5 rounded-xl border border-white/10">
+              <div className="flex justify-between items-center">
+                <label className="text-[10px] uppercase font-bold text-slate-400">Durée (mois)</label>
+                <span className="text-lg font-bold text-slate-200 font-mono">{offerDuration}m</span>
+              </div>
+              <input
+                type="range"
+                min={6}
+                max={48}
+                step={6}
+                value={offerDuration}
+                onChange={(e) => setOfferDuration(Number(e.target.value))}
+                disabled={dealStatus !== 'negotiating'}
+                className="w-full accent-slate-400 h-2.5 bg-white/20 rounded-lg appearance-none cursor-pointer hover:bg-white/30 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              />
+              <div className="flex justify-between text-[9px] text-slate-500 font-bold">
+                <span>6m</span>
+                <span>48m</span>
+              </div>
+            </div>
+
+            {/* Exclusivity */}
+            <div className="space-y-3 p-4 bg-white/5 rounded-xl border border-white/10 flex items-center justify-between">
+              <div>
+                <label className="text-[10px] uppercase font-bold text-slate-400">Exclusivité</label>
+                <p className="text-[11px] text-slate-400">Le label détient l'exclusivité des enregistrements</p>
+              </div>
+              <button
+                onClick={() => setOfferExclusivity(v => !v)}
+                className={`px-3 py-2 rounded-lg font-bold ${offerExclusivity ? 'bg-emerald-600 text-white' : 'bg-white/5 text-slate-300'}`}
+              >
+                {offerExclusivity ? 'Oui' : 'Non'}
+              </button>
+            </div>
+
+            {/* Recoupment */}
+            <div className="space-y-3 p-4 bg-white/5 rounded-xl border border-white/10">
+              <div className="flex justify-between items-center">
+                <label className="text-[10px] uppercase font-bold text-slate-400">Recouvrement (%)</label>
+                <span className="text-lg font-bold text-amber-300 font-mono">{offerRecoupment}%</span>
+              </div>
+              <input
+                type="range"
+                min={0}
+                max={100}
+                step={5}
+                value={offerRecoupment}
+                onChange={(e) => setOfferRecoupment(Number(e.target.value))}
+                disabled={dealStatus !== 'negotiating'}
+                className="w-full accent-amber-400 h-2.5 bg-white/20 rounded-lg appearance-none cursor-pointer hover:bg-white/30 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              />
+              <div className="flex justify-between text-[9px] text-slate-500 font-bold">
+                <span>0%</span>
+                <span>100%</span>
+              </div>
+            </div>
+
+            {/* Option Periods */}
+            <div className="space-y-3 p-4 bg-white/5 rounded-xl border border-white/10">
+              <div className="flex justify-between items-center">
+                <label className="text-[10px] uppercase font-bold text-slate-400">Périodes optionnelles</label>
+                <span className="text-lg font-bold text-slate-200 font-mono">{offerOptionPeriods}</span>
+              </div>
+              <input
+                type="range"
+                min={0}
+                max={3}
+                step={1}
+                value={offerOptionPeriods}
+                onChange={(e) => setOfferOptionPeriods(Number(e.target.value))}
+                disabled={dealStatus !== 'negotiating'}
+                className="w-full accent-slate-400 h-2.5 bg-white/20 rounded-lg appearance-none cursor-pointer hover:bg-white/30 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              />
+              <div className="flex justify-between text-[9px] text-slate-500 font-bold">
+                <span>0</span>
+                <span>3</span>
               </div>
             </div>
 

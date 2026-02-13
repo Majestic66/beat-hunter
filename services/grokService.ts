@@ -273,7 +273,13 @@ export async function generateGlobalNewsWithGrok(): Promise<string> {
 // (Ces fonctions sont définies plus bas dans le fichier actuel)
 
 declare function generateTalentsForCountry(countryName: string): Promise<Partial<Talent>[]>;
-declare function getNegotiationResponse(talent: Talent, offerAdvance: number, offerRoyalty: number, chatHistory: any[]): Promise<{ reply: string, accepted: boolean }>;
+declare function getNegotiationResponse(
+  talent: Talent,
+  offerAdvance: number,
+  offerRoyalty: number,
+  chatHistory: any[],
+  options?: { duration?: number; exclusivity?: boolean; recoupmentRate?: number; optionPeriods?: number }
+): Promise<{ reply: string, accepted: boolean }>;
 declare function getArtistChatResponse(talent: Talent, chatHistory: any[], actionType: string, context?: any): Promise<{ reply: string, action?: any, relationshipChange: number }>;
 declare function generateReleaseResult(talent: Talent, strategy: string, collaborators?: Talent[]): Promise<Release>;
 declare function generateGlobalNews(): Promise<string>;
